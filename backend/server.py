@@ -762,6 +762,63 @@ async def export_scores(round_id: str, admin: User = Depends(require_admin)):
         headers={"Content-Disposition": f"attachment; filename=scores_round_{round_id}.csv"}
     )
 
+# Admin Data Reset Endpoints
+class ResetResponse(BaseModel):
+    message: str
+    deleted_counts: dict
+
+@api_router.delete("/admin/reset/scores", response_model=ResetResponse)
+async def reset_scores(admin: User = Depends(require_admin)):
+    """Reset all scores only"""
+    result = await db.scores.delete_many({})
+    return ResetResponse(
+        message="All scores have been deleted",
+        deleted_counts={"scores": result.deleted_count}
+    )
+
+@api_router.delete("/admin/reset/competition", response_model=ResetResponse)
+async def reset_competition_data(admin: User = Depends(require_admin)):
+    """Reset all competition data (scores, competitors, rounds, classes)"""
+    scores_result = await db.scores.delete_many({})
+    competitors_result = await db.competitors.delete_many({})
+    rounds_result = await db.rounds.delete_many({})
+    classes_result = await db.classes.delete_many({})
+    
+    return ResetResponse(
+        message="All competition data has been deleted",
+        deleted_counts={
+            "scores": scores_result.deleted_count,
+            "competitors": competitors_result.deleted_count,
+            "rounds": rounds_result.deleted_count,
+            "classes": classes_result.deleted_count
+        }
+    )
+
+@api_router.delete("/admin/reset/full", response_model=ResetResponse)
+async def reset_full(admin: User = Depends(require_admin)):
+    """Full reset - delete everything except the current admin user"""
+    # Get current admin's ID to preserve
+    current_admin = await db.users.find_one({"role": "admin"}, {"_id": 0, "id": 1})
+    admin_id = current_admin["id"] if current_admin else None
+    
+    scores_result = await db.scores.delete_many({})
+    competitors_result = await db.competitors.delete_many({})
+    rounds_result = await db.rounds.delete_many({})
+    classes_result = await db.classes.delete_many({})
+    # Delete all judges but keep admin
+    judges_result = await db.users.delete_many({"role": "judge"})
+    
+    return ResetResponse(
+        message="Full reset completed (admin account preserved)",
+        deleted_counts={
+            "scores": scores_result.deleted_count,
+            "competitors": competitors_result.deleted_count,
+            "rounds": rounds_result.deleted_count,
+            "classes": classes_result.deleted_count,
+            "judges": judges_result.deleted_count
+        }
+    )
+
 app.include_router(api_router)
 
 app.add_middleware(
