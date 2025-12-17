@@ -334,7 +334,7 @@ export default function JudgeScoring({ user, onLogout }) {
             </div>
             <div>
               <p className="ui-font text-sm tracking-wide text-[#a1a1aa] uppercase">Penalties</p>
-              <p className="data-font text-4xl font-bold text-[#ef4444]" data-testid="penalty-total">-{totals.penalties}</p>
+              <p className="data-font text-4xl font-bold text-[#ef4444]" data-testid="penalty-total">{totals.penalties > 0 ? '-' : ''}{totals.penalties}</p>
             </div>
             <div>
               <p className="ui-font text-sm tracking-wide text-[#a1a1aa] uppercase">Final Score</p>
