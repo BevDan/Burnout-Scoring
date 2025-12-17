@@ -114,7 +114,7 @@ class Round(BaseModel):
 class RoundCreate(BaseModel):
     name: str
     date: str
-    status: str = "active"
+    round_status: str = "active"
 
 class Score(BaseModel):
     model_config = ConfigDict(extra="ignore")
