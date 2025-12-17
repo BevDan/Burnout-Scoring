@@ -47,6 +47,34 @@ export default function AdminDashboard({ user, onLogout }) {
     }
   };
 
+  const handleProfileUpdate = async () => {
+    try {
+      const updateData = {};
+      if (profileData.name) updateData.name = profileData.name;
+      if (profileData.password) updateData.password = profileData.password;
+
+      if (Object.keys(updateData).length === 0) {
+        toast.error('Please provide name or password to update');
+        return;
+      }
+
+      await axios.put(`${API}/auth/profile`, updateData, getAuthHeaders());
+      toast.success('Profile updated successfully');
+      setProfileOpen(false);
+      setProfileData({ name: '', password: '' });
+      
+      // Update local user data if name changed
+      if (updateData.name) {
+        const userData = JSON.parse(localStorage.getItem('user'));
+        userData.name = updateData.name;
+        localStorage.setItem('user', JSON.stringify(userData));
+        window.location.reload(); // Reload to show new name
+      }
+    } catch (error) {
+      toast.error('Failed to update profile');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#09090b] noise-overlay" data-testid="admin-dashboard">
       <header className="bg-[#18181b] border-b border-[#27272a] px-6 py-4">
