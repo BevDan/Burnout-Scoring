@@ -101,3 +101,26 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+## Session: 2025-12-17 - Bug Fixes
+
+### Bugs Fixed:
+1. **P0 - Rounds Tab Blank Page**: Fixed by changing `status` to `round_status` in AdminDashboard.js to match API field names
+2. **P1 - Judge Competitor Selection**: Fixed by updating JudgeScoring.js to filter by `round_status` instead of `status`, and made `plate`/`vehicle_info` optional in backend Pydantic model  
+3. **P2 - Competitor Number Font**: Added Roboto Mono font with slashed-zero variant for clearer number distinction
+
+### Files Changed:
+- `/app/frontend/src/pages/AdminDashboard.js` - Changed all `status` references to `round_status`
+- `/app/frontend/src/pages/JudgeScoring.js` - Fixed round filtering logic, added car-number-font class to dropdown
+- `/app/frontend/src/index.css` - Added Roboto Mono Google Font import and `.car-number-font` utility class
+- `/app/backend/server.py` - Made `plate` and `vehicle_info` optional with defaults in CompetitorWithClass model
+
+### Test Credentials:
+- Admin: username=admin, password=admin123
+- Judge: username=judge1, password=judge123
+
+### Test Plan:
+1. **Admin Rounds Tab**: Login as admin, click Rounds tab - should display list of rounds with ACTIVE/COMPLETED status
+2. **Judge Round Selection**: Login as judge, Select Round dropdown should show all active rounds
+3. **Judge Competitor Selection**: After selecting a round, Select Competitor dropdown should show all competitors
+4. **Font Verification**: Car numbers in competitor lists should use clear Roboto Mono font (0 vs 8 distinction)
