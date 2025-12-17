@@ -1,0 +1,209 @@
+<analysis>**original_problem_statement:**
+The user wants to build a full-stack web application to score a burnout competition.
+
+**PRODUCT REQUIREMENTS:**
+1.  **Database**: Load competitor details from a database (user initially suggested SQL but agreed to MongoDB).
+2.  **Authentication**: A login function for judges and an admin.
+3.  **Scoring Categories**:
+    *   Instant Smoke: 0-10 points.
+    *   Constant Smoke & Volume of Smoke: 0-20 points.
+    *   Driving Skill: 0-40 points.
+    *   Tyre Popped: 5 points each (user later clarified a max of 2).
+4.  **Penalties**:
+    *   -5 points for: Reversing, Stopping, Contact with Barrier, Small Fire.
+    *   -10 points for: Failing to drive off pad, Large Fire.
+    *   User later clarified that penalties should be cumulative (e.g., reversing twice is -10 points).
+5.  **Score Management**:
+    *   Judges should be able to review their own score entries after submission.
+    *   Judges should be able to edit their own submitted scores, and the edit should be timestamped.
+6.  **Admin Functionality**:
+    *   Admin interface to add/edit/delete competitors, judges, competition classes, and rounds.
+    *   Ability to bulk import competitor data via CSV.
+    *   Ability to download all scoring data.
+    *   Ability to change the admin's own name and password.
+    *   Ability to deactivate or complete a round.
+7.  **Leaderboard**:
+    *   Display results per competition class.
+    *   Leaderboard should be based on the average score from multiple judges.
+8.  **Competitor Details**:
+    *   The user requested adding a plate field for competitors to help judges identify them.
+    *   The judge's scoring page should display the competitor's number, name, vehicle description, and plate.
+9.  **UI/UX**:
+    *   The user requested sliders for score entry in addition to +/- buttons.
+    *   The font for the competitor number should clearly distinguish between digits like '0' and '8'.
+10. **Deployment**:
+    *   The user wants to host the application on their own hardware, which is a Radxa Rock 3A single-board computer.
+    *   The application should be accessible over the internet with HTTPS.
+
+**User's preferred language**: English
+
+**what currently exists?**
+A full-stack burnout competition scoring application has been built using FastAPI (Python) for the backend, React for the frontend, and MongoDB for the database. The application is deployed on the user's Radxa Rock 3A device using Docker for MongoDB, with Nginx as an HTTPS-enabled reverse proxy.
+
+The application includes:
+-   Role-based authentication (admin, judge).
+-   Admin dashboard for managing judges, classes, competitors (including CSV import), and rounds. Admins can also download all scoring data and manage their own profile.
+-   A judge scoring page with sliders, cumulative penalty counters, and display of competitor details.
+-   Judges can review and edit their submitted scores.
+-   The system has been secured with HTTPS (via Let's Encrypt) and rate limiting on the login endpoint.
+-   The user is deploying updates via a public GitHub repository.
+
+**Last working item**:
+- Last item agent was working: The user reported that the Rounds tab on the admin dashboard shows a blank page. The agent diagnosed this as a JavaScript TypeError:  in  at line 761. This is caused by some  objects in the database missing a  property. The agent's first attempt to fix this with  failed, and it was about to attempt the fix again with the correct file context.
+- Status: IN PROGRESS
+- Agent Testing Done: N
+- Which testing method agent to use? After applying the fix, use the **screenshot tool** on the admin dashboard with the Rounds tab active to quickly verify that the page renders without crashing.
+- User Testing Done: N
+
+**All Pending/In progress Issue list**:
+-   **Issue 1 (P0)**: Rounds tab in the admin dashboard is blank.
+-   **Issue 2 (P1)**: Judge scoring page: cant select a competitor.
+-   **Issue 3 (P2)**: The font for the competitor number is still not distinct enough.
+
+**Issues Detail:**
+-   **Issue 1: Rounds tab is blank**
+    -   **Attempted fixes:** A  tool call failed due to a mismatch in the .
+    -   **Next debug checklist:**
+        1.  Edit .
+        2.  Locate the error at line 761: .
+        3.  Apply a fix to handle undefined status, changing it to . This provides a default value and prevents the TypeError.
+    -   **Why fix this issue and what will be achieved with the fix?** This will make the Rounds management tab functional, which is critical for the admin user.
+    -   **Status:** IN PROGRESS
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** Frontend.
+
+-   **Issue 2: Judge can't select a competitor**
+    -   **Attempted fixes:** The agent added an empty state message to the competitor dropdown, but this did not fix the underlying problem.
+    -   **Next debug checklist:**
+        1.  Review the  function in .
+        2.  Check the browser's developer console (Network and Console tabs) on the Judge Scoring page to see if the API call to fetch competitors is failing or returning empty/incorrect data.
+        3.  Ensure the  handler for the round selection correctly triggers the competitor fetch.
+    -   **Why fix this issue and what will be achieved with the fix?** This is a critical bug as judges cannot submit scores without selecting a competitor.
+    -   **Status:** IN PROGRESS
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** Frontend.
+
+-   **Issue 3: Competitor number font needs improvement**
+    -   **Attempted fixes:** The font was changed first to  and then to , which the user found only marginally better.
+    -   **Next debug checklist:**
+        1.  Edit  to import a clearer numeric font from Google Fonts, such as 'Roboto Mono' or 'IBM Plex Mono'.
+        2.  Create a more specific utility class (e.g., ) that applies this font.
+        3.  Apply this class to all elements displaying the  in  and .
+    -   **Why fix this issue and what will be achieved with the fix?** To improve usability and prevent judges from making scoring errors based on misreading a number.
+    -   **Status:** IN PROGRESS
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** Frontend.
+
+**In progress Task List**:
+None. All current work items are classified as bug fixes.
+
+**Upcoming and Future Tasks**
+None defined by the user.
+
+**Completed work in this session**
+- **Core Application Built (DONE)**
+- **User Authentication (DONE)**: Implemented JWT-based login for Admins and Judges.
+- **Admin Dashboard (PARTIALLY DONE - BUGS EXIST)**: Created panels for managing Judges, Classes, Competitors, and Rounds.
+- **Judge Scoring Page (PARTIALLY DONE - BUGS EXIST)**: Created scoring interface with sliders and cumulative penalties.
+- **Feature: CSV Import (DONE)**: Admins can bulk-import competitors.
+- **Feature: Score Editing (DONE)**: Judges can edit their own scores.
+- **Feature: Data Export (DONE)**: Admins can download all scoring data as a CSV.
+- **Feature: Profile Management (DONE)**: Admins and Judges can change their own name and password.
+- **Deployment Guidance (DONE)**: Assisted user with full deployment to a Radxa Rock 3A, including OS-level troubleshooting for Docker, Node.js, Python, Nginx, and Systemd.
+- **Security Hardening (DONE)**: Implemented HTTPS with Let's Encrypt and rate limiting on the login API.
+- **Database Management (DONE)**: Guided user on how to inspect and clean the MongoDB database.
+- **UI Customizations (DONE)**: Removed leaderboard button from judge's page and default admin notice from login page.
+
+**Earlier issues found/mentioned but not fixed**
+None. The agent has addressed all user-reported issues, though some fixes are still in progress.
+
+**Known issue recurrence from previous fork**
+N/A
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+-   **Frontend**: React, , , Tailwind CSS
+-   **Backend**: Python, FastAPI,  (async MongoDB driver), Pydantic
+-   **Database**: MongoDB
+-   **Deployment**: The application is deployed on a Radxa Rock 3A (ARM64, Debian-based OS).
+    -   MongoDB runs in a Docker container.
+    -   The FastAPI backend runs as a  service.
+    -   Nginx acts as a reverse proxy, serving the React frontend and routing  calls to the backend.
+    -   HTTPS is enabled via Let's Encrypt.
+
+**key DB schema**
+-   **users**: 
+-   **competitors**: 
+-   **classes**: 
+-   **rounds**:  (Note:  field is sometimes missing, causing bugs)
+-   **scores**: 
+
+**changes in tech stack**
+-   The user initially mentioned a sql database but agreed to proceed with MongoDB.
+
+**All files of reference**
+-   : Contains the JavaScript bug causing the Rounds tab to be blank.
+-   : Contains the bug where competitors cannot be selected and needs a font update.
+-   : The single file containing all backend API logic.
+-    (on user's machine): The Nginx configuration file for the reverse proxy and HTTPS.
+-    (on user's machine): The service file managing the backend process.
+
+**Areas that need refactoring**:
+-    and  have become very large. They contain multiple sub-components, dialogs, and complex state logic within a single file. They should be broken down into smaller, more focused components to improve maintainability.
+
+**key api endpoints**
+-   : User login.
+-   : Fetches all rounds for the admin dashboard.
+-   : Fetches competitors for a specific round for the judge scoring page.
+
+**Critical Info for New Agent**
+-   The user is deploying to custom ARM-based hardware (Radxa Rock 3A). Be mindful of potential architecture-specific dependency issues (e.g., Python packages needing compilation, Node.js version incompatibilities).
+-   The database has proven to have inconsistent data (e.g.,  documents missing the  field). All frontend and backend code should be written defensively to handle potentially  or  properties from database records.
+-   The user is technical and comfortable with the command line on their device. You can provide  commands for them to execute for deployment and debugging.
+-   Deployment is done via  from a public GitHub repo, followed by yarn run v1.22.22
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command. and service restarts.
+
+**documents created in this job**
+-   
+-   
+-   Various setup scripts (, , etc.)
+
+**Last 10 User Messages and any pending user messages**
+1.  **User**: Confirms HTTPS works but login is broken.
+2.  **Agent**: Suggests the issue is mixed content (HTTPS frontend calling HTTP backend).
+3.  **User**: Provides the frontend  file, confirming the agent's suspicion. .
+4.  **Agent**: Explains the mixed content issue and instructs the user to clear  and rebuild the frontend.
+5.  **User**: okay it is now working, what needs to be changed to remove the default admin notice at the bottom of the login page. **Status: Completed**.
+6.  **Agent**: Removes the notice.
+7.  **User**: Reports three new issues: competitor number font is hard to read, Rounds button gives a blank page, and can't select a competitor on the judge page. **Status: In Progress**.
+8.  **Agent**: Attempts fixes for all three.
+9.  **User**: the font is marginally better, but the rounds button still goes to a blank black page. **Status: In Progress**.
+10. **Agent**: Asks for debug info for the blank page.
+11. **User**: Provides the JavaScript stack trace:  in . **Status: In Progress**.
+12. **Agent**: Identifies the cause and attempts a fix which fails.
+13. **User**: Asks if the fix is finished.
+14. **Agent**: Confirms the fix failed and views the file to re-attempt.
+15. **User**: Reposts the error message.
+16. **Agent**: Now I can fix it:. **This is the current pending action.**
+
+**Project Health Check:**
+-   **Broken**: The Rounds tab and competitor selection dropdown are non-functional, blocking key admin and judge workflows.
+-   **Mocked**: None.
+
+**3rd Party Integrations**
+-   None.
+
+**Testing status**
+-   **Testing agent used after significant changes**: NO (Only used once early on).
+-   **Troubleshoot agent used after agent stuck in loop**: NO.
+-   **Test files created**: None.
+-   **Known regressions**: The admin Rounds tab and judge competitor selection were previously working but are now broken, likely due to schema changes or recent feature additions.
+
+**Credentials to test flow:**
+-   **URL**: 
+-   **Admin**:  /  (or user-defined password).
+
+**What agent forgot to execute**
+- The agent didn't write defensive code to handle missing optional fields (like  on a round), which is the direct cause of the current high-priority bug. This should be a priority for all future code edits.</analysis>
