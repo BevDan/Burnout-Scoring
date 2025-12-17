@@ -744,46 +744,53 @@ function RoundsPanel({ rounds, onRefresh }) {
       </div>
 
       <div className="space-y-3">
-        {rounds.map((round) => (
-          <div key={round.id} className="bg-[#18181b] p-4 rounded border border-[#27272a] flex justify-between items-center">
-            <div>
-              <p className="ui-font text-lg font-semibold text-white">{round.name}</p>
-              <p className="text-sm text-[#a1a1aa]">{round.date}</p>
-              <span className={`inline-block mt-2 px-3 py-1 rounded text-xs font-bold ${
-                round.status === 'active' ? 'bg-[#22c55e] text-black' : 'bg-[#71717a] text-white'
-              }`}>
-                {round.status.toUpperCase()}
-              </span>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                onClick={() => startEdit(round)}
-                className="bg-[#f59e0b] hover:bg-[#d97706]"
-                size="sm"
-                data-testid={`edit-round-${round.id}`}
-              >
-                Edit
-              </Button>
-              <Button
-                onClick={() => handleExport(round.id)}
-                className="bg-[#0ea5e9] hover:bg-[#0284c7]"
-                size="sm"
-                data-testid={`export-round-${round.id}`}
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Export
-              </Button>
-              <Button
-                onClick={() => handleDelete(round.id)}
-                variant="destructive"
-                size="sm"
-                data-testid={`delete-round-${round.id}`}
-              >
-                Delete
-              </Button>
-            </div>
+        {rounds.length === 0 ? (
+          <div className="text-center py-12 bg-[#18181b] rounded border border-[#27272a]">
+            <Calendar className="w-12 h-12 text-[#a1a1aa] mx-auto mb-3" />
+            <p className="text-[#a1a1aa]">No rounds created yet. Click "Add Round" to get started.</p>
           </div>
-        ))}
+        ) : (
+          rounds.map((round) => (
+            <div key={round.id} className="bg-[#18181b] p-4 rounded border border-[#27272a] flex justify-between items-center">
+              <div>
+                <p className="ui-font text-lg font-semibold text-white">{round.name}</p>
+                <p className="text-sm text-[#a1a1aa]">{round.date}</p>
+                <span className={`inline-block mt-2 px-3 py-1 rounded text-xs font-bold ${
+                  round.status === 'active' ? 'bg-[#22c55e] text-black' : 'bg-[#71717a] text-white'
+                }`}>
+                  {round.status.toUpperCase()}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => startEdit(round)}
+                  className="bg-[#f59e0b] hover:bg-[#d97706]"
+                  size="sm"
+                  data-testid={`edit-round-${round.id}`}
+                >
+                  Edit
+                </Button>
+                <Button
+                  onClick={() => handleExport(round.id)}
+                  className="bg-[#0ea5e9] hover:bg-[#0284c7]"
+                  size="sm"
+                  data-testid={`export-round-${round.id}`}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Export
+                </Button>
+                <Button
+                  onClick={() => handleDelete(round.id)}
+                  variant="destructive"
+                  size="sm"
+                  data-testid={`delete-round-${round.id}`}
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
