@@ -196,14 +196,6 @@ export default function JudgeScoring({ user, onLogout }) {
             >
               My Scores
             </Button>
-            <Button
-              onClick={() => navigate('/leaderboard')}
-              className="bg-[#22c55e] hover:bg-[#16a34a] text-white"
-              size="sm"
-              data-testid="view-leaderboard-button"
-            >
-              <Trophy className="w-4 h-4" />
-            </Button>
             <Button 
               onClick={() => setProfileOpen(true)}
               variant="outline" 
