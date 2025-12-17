@@ -283,8 +283,8 @@ export default function JudgeScoring({ user, onLogout }) {
           <ScoreInput
             label="Tyres Popped (5pts each)"
             value={scoreData.tyres_popped}
-            max={4}
-            onChange={(v) => updateScore('tyres_popped', v, 4)}
+            max={2}
+            onChange={(v) => updateScore('tyres_popped', v, 2)}
             points={scoreData.tyres_popped * 5}
             testId="tyres-popped"
           />
