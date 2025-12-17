@@ -301,7 +301,7 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
   const [open, setOpen] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
   const [csvData, setCsvData] = useState('');
-  const [formData, setFormData] = useState({ name: '', car_number: '', vehicle_info: '', class_id: '' });
+  const [formData, setFormData] = useState({ name: '', car_number: '', vehicle_info: '', plate: '', class_id: '' });
 
   const handleCreate = async () => {
     try {
