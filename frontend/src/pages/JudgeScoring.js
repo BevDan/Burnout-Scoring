@@ -22,6 +22,8 @@ export default function JudgeScoring({ user, onLogout }) {
   const [selectedCompetitor, setSelectedCompetitor] = useState(null);
   const [myScores, setMyScores] = useState([]);
   const [showReview, setShowReview] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [profileData, setProfileData] = useState({ name: '', password: '' });
 
   const [scoreData, setScoreData] = useState({
     instant_smoke: 0,
