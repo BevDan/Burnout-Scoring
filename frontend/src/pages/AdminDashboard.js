@@ -416,6 +416,15 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
                   />
                 </div>
                 <div>
+                  <Label>Plate</Label>
+                  <Input
+                    value={formData.plate}
+                    onChange={(e) => setFormData({ ...formData, plate: e.target.value })}
+                    className="bg-[#09090b] border-[#27272a]"
+                    data-testid="competitor-plate-input"
+                  />
+                </div>
+                <div>
                   <Label>Class</Label>
                   <Select value={formData.class_id} onValueChange={(value) => setFormData({ ...formData, class_id: value })}>
                     <SelectTrigger className="bg-[#09090b] border-[#27272a]" data-testid="competitor-class-select">
