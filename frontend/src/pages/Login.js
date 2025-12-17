@@ -96,12 +96,6 @@ export default function Login({ onLogin }) {
               {loading ? 'LOGGING IN...' : 'LOGIN'}
             </button>
           </form>
-
-          <div className="mt-6 p-4 bg-[#18181b] rounded border border-[#27272a]">
-            <p className="text-xs text-[#a1a1aa] text-center">
-              Default Admin: <span className="data-font text-[#f97316]">admin / admin123</span>
-            </p>
-          </div>
         </div>
       </div>
     </div>
