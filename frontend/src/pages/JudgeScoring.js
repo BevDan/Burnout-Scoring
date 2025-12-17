@@ -463,21 +463,44 @@ function ScoreInput({ label, value, max, onChange, points, testId }) {
   );
 }
 
-function PenaltyToggle({ label, active, onToggle, testId }) {
+function PenaltyCounter({ label, points, value, onChange, testId }) {
+  const totalPenalty = value * points;
+  
   return (
-    <button
-      onClick={onToggle}
-      className={`penalty-toggle p-4 rounded border-2 text-left transition-all ${
-        active
-          ? 'bg-[#ef4444] border-[#ef4444] text-white neon-glow'
-          : 'bg-[#18181b] border-[#27272a] text-[#a1a1aa] hover:border-[#3f3f46]'
-      }`}
-      data-testid={testId}
-    >
-      <div className="flex items-center justify-between">
-        <span className="ui-font text-lg font-semibold">{label}</span>
-        {active && <AlertTriangle className="w-5 h-5" />}
+    <div className={`p-4 rounded border-2 transition-all ${
+      value > 0
+        ? 'bg-[#ef4444]/20 border-[#ef4444] neon-glow'
+        : 'bg-[#18181b] border-[#27272a]'
+    }`}>
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <span className="ui-font text-lg font-semibold text-white">{label}</span>
+          <p className="text-xs text-[#a1a1aa]">-{points} pts each</p>
+        </div>
+        {value > 0 && <AlertTriangle className="w-5 h-5 text-[#ef4444]" />}
       </div>
-    </button>
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => onChange(value - 1)}
+          className="w-10 h-10 bg-[#27272a] hover:bg-[#3f3f46] rounded text-white font-bold transition-colors"
+          data-testid={`${testId}-minus`}
+        >
+          <Minus className="w-4 h-4 mx-auto" />
+        </button>
+        <div className="flex-1 text-center">
+          <div className="data-font text-3xl font-bold text-[#ef4444]" data-testid={testId}>{value}</div>
+          {totalPenalty > 0 && (
+            <div className="text-xs text-[#ef4444] mt-1">-{totalPenalty} pts</div>
+          )}
+        </div>
+        <button
+          onClick={() => onChange(value + 1)}
+          className="w-10 h-10 bg-[#ef4444] hover:bg-[#dc2626] rounded text-white font-bold transition-colors"
+          data-testid={`${testId}-plus`}
+        >
+          <Plus className="w-4 h-4 mx-auto" />
+        </button>
+      </div>
+    </div>
   );
 }
