@@ -226,7 +226,8 @@ async def require_admin(current_user: User = Depends(get_current_user)) -> User:
 
 # Auth routes
 @api_router.post("/auth/login", response_model=LoginResponse)
-async def login(request: LoginRequest):
+@limiter.limit("5/minute")
+async def login(request: Request, login_request: LoginRequest):
     user_data = await db.users.find_one({"username": request.username}, {"_id": 0})
     if not user_data:
         raise HTTPException(status_code=401, detail="Invalid credentials")
