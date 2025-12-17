@@ -649,11 +649,10 @@ async def get_leaderboard(round_id: str, class_id: Optional[str] = None, current
 # Export
 @api_router.get("/export/all-data")
 async def export_all_data(admin: User = Depends(require_admin)):
-    # Export all data including competitors, rounds, classes, judges, and all scores
+    # Export all data including competitors, rounds, classes, and all scores
     competitors = await db.competitors.find({}, {"_id": 0}).to_list(10000)
     rounds = await db.rounds.find({}, {"_id": 0}).to_list(10000)
     classes = await db.classes.find({}, {"_id": 0}).to_list(10000)
-    judges = await db.users.find({"role": "judge"}, {"_id": 0, "password_hash": 0}).to_list(10000)
     scores = await db.scores.find({}, {"_id": 0}).to_list(10000)
     
     # Create dictionaries for lookups
