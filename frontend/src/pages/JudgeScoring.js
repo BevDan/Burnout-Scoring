@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { LogOut, Trophy, Flame, Minus, Plus, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { LogOut, Trophy, Flame, Minus, Plus, AlertTriangle, CheckCircle2, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
