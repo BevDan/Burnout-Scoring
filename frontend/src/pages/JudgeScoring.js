@@ -466,3 +466,269 @@ function PenaltyCounter({ label, points, value, onChange, testId }) {
     </div>
   );
 }
+
+function ScoreReviewDialog({ open, onOpenChange, scores, onScoreUpdated }) {
+  const [editingScore, setEditingScore] = useState(null);
+  const [editData, setEditData] = useState(null);
+
+  const startEdit = (score) => {
+    setEditingScore(score.id);
+    setEditData({
+      instant_smoke: score.instant_smoke,
+      constant_smoke: score.constant_smoke,
+      volume_of_smoke: score.volume_of_smoke,
+      driving_skill: score.driving_skill,
+      tyres_popped: score.tyres_popped,
+      penalty_reversing: score.penalty_reversing,
+      penalty_stopping: score.penalty_stopping,
+      penalty_contact_barrier: score.penalty_contact_barrier,
+      penalty_small_fire: score.penalty_small_fire,
+      penalty_failed_drive_off: score.penalty_failed_drive_off,
+      penalty_large_fire: score.penalty_large_fire
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingScore(null);
+    setEditData(null);
+  };
+
+  const saveEdit = async () => {
+    try {
+      await axios.put(`${API}/judge/scores/${editingScore}`, editData, getAuthHeaders());
+      toast.success('Score updated successfully');
+      setEditingScore(null);
+      setEditData(null);
+      onScoreUpdated();
+    } catch (error) {
+      toast.error('Failed to update score');
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="bg-[#18181b] border-[#27272a] text-white max-w-5xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="ui-font text-2xl">MY SUBMITTED SCORES</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          {scores.map((score) => (
+            <div key={score.id} className="bg-[#09090b] p-5 rounded border border-[#27272a]">
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="data-font text-2xl font-bold text-[#f97316]">#{score.car_number}</span>
+                    <div>
+                      <p className="ui-font text-xl font-bold text-white">{score.competitor_name}</p>
+                      <p className="text-sm text-[#a1a1aa]">{score.round_name}</p>
+                    </div>
+                  </div>
+                  {score.edited_at && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <AlertTriangle className="w-4 h-4 text-[#f59e0b]" />
+                      <span className="text-xs text-[#f59e0b]">
+                        Edited: {new Date(score.edited_at).toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="text-right">
+                  <p className="data-font text-4xl font-bold text-[#f97316]">{score.final_score}</p>
+                  <p className="text-xs text-[#a1a1aa] mt-1">
+                    Submitted: {new Date(score.submitted_at).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+
+              {editingScore === score.id ? (
+                <div className="space-y-4 bg-[#18181b] p-4 rounded">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm text-[#a1a1aa]">Instant Smoke (0-10)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="10"
+                        value={editData.instant_smoke}
+                        onChange={(e) => setEditData({...editData, instant_smoke: parseInt(e.target.value) || 0})}
+                        className="w-full mt-1 px-3 py-2 bg-[#09090b] border border-[#27272a] rounded text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-[#a1a1aa]">Constant Smoke (0-20)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="20"
+                        value={editData.constant_smoke}
+                        onChange={(e) => setEditData({...editData, constant_smoke: parseInt(e.target.value) || 0})}
+                        className="w-full mt-1 px-3 py-2 bg-[#09090b] border border-[#27272a] rounded text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-[#a1a1aa]">Volume of Smoke (0-20)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="20"
+                        value={editData.volume_of_smoke}
+                        onChange={(e) => setEditData({...editData, volume_of_smoke: parseInt(e.target.value) || 0})}
+                        className="w-full mt-1 px-3 py-2 bg-[#09090b] border border-[#27272a] rounded text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-[#a1a1aa]">Driving Skill (0-40)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="40"
+                        value={editData.driving_skill}
+                        onChange={(e) => setEditData({...editData, driving_skill: parseInt(e.target.value) || 0})}
+                        className="w-full mt-1 px-3 py-2 bg-[#09090b] border border-[#27272a] rounded text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-[#a1a1aa]">Tyres Popped (0-2)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="2"
+                        value={editData.tyres_popped}
+                        onChange={(e) => setEditData({...editData, tyres_popped: parseInt(e.target.value) || 0})}
+                        className="w-full mt-1 px-3 py-2 bg-[#09090b] border border-[#27272a] rounded text-white"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm text-[#a1a1aa] block mb-2">Penalties</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <span className="text-xs text-[#a1a1aa]">Reversing</span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={editData.penalty_reversing}
+                          onChange={(e) => setEditData({...editData, penalty_reversing: parseInt(e.target.value) || 0})}
+                          className="w-full mt-1 px-2 py-1 bg-[#09090b] border border-[#27272a] rounded text-white text-sm"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-xs text-[#a1a1aa]">Stopping</span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={editData.penalty_stopping}
+                          onChange={(e) => setEditData({...editData, penalty_stopping: parseInt(e.target.value) || 0})}
+                          className="w-full mt-1 px-2 py-1 bg-[#09090b] border border-[#27272a] rounded text-white text-sm"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-xs text-[#a1a1aa]">Barrier</span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={editData.penalty_contact_barrier}
+                          onChange={(e) => setEditData({...editData, penalty_contact_barrier: parseInt(e.target.value) || 0})}
+                          className="w-full mt-1 px-2 py-1 bg-[#09090b] border border-[#27272a] rounded text-white text-sm"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-xs text-[#a1a1aa]">Small Fire</span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={editData.penalty_small_fire}
+                          onChange={(e) => setEditData({...editData, penalty_small_fire: parseInt(e.target.value) || 0})}
+                          className="w-full mt-1 px-2 py-1 bg-[#09090b] border border-[#27272a] rounded text-white text-sm"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-xs text-[#a1a1aa]">Failed Drive Off</span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={editData.penalty_failed_drive_off}
+                          onChange={(e) => setEditData({...editData, penalty_failed_drive_off: parseInt(e.target.value) || 0})}
+                          className="w-full mt-1 px-2 py-1 bg-[#09090b] border border-[#27272a] rounded text-white text-sm"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-xs text-[#a1a1aa]">Large Fire</span>
+                        <input
+                          type="number"
+                          min="0"
+                          value={editData.penalty_large_fire}
+                          onChange={(e) => setEditData({...editData, penalty_large_fire: parseInt(e.target.value) || 0})}
+                          className="w-full mt-1 px-2 py-1 bg-[#09090b] border border-[#27272a] rounded text-white text-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-3 pt-2">
+                    <Button onClick={saveEdit} className="flex-1 btn-primary">
+                      Save Changes
+                    </Button>
+                    <Button onClick={cancelEdit} variant="outline" className="flex-1 border-[#27272a]">
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm mb-3">
+                    <div className="bg-[#18181b] p-2 rounded">
+                      <span className="text-[#a1a1aa] block text-xs">Instant Smoke</span>
+                      <span className="data-font text-white font-bold">{score.instant_smoke}</span>
+                    </div>
+                    <div className="bg-[#18181b] p-2 rounded">
+                      <span className="text-[#a1a1aa] block text-xs">Constant</span>
+                      <span className="data-font text-white font-bold">{score.constant_smoke}</span>
+                    </div>
+                    <div className="bg-[#18181b] p-2 rounded">
+                      <span className="text-[#a1a1aa] block text-xs">Volume</span>
+                      <span className="data-font text-white font-bold">{score.volume_of_smoke}</span>
+                    </div>
+                    <div className="bg-[#18181b] p-2 rounded">
+                      <span className="text-[#a1a1aa] block text-xs">Driving</span>
+                      <span className="data-font text-white font-bold">{score.driving_skill}</span>
+                    </div>
+                    <div className="bg-[#18181b] p-2 rounded">
+                      <span className="text-[#a1a1aa] block text-xs">Tyres</span>
+                      <span className="data-font text-white font-bold">{score.tyres_popped}</span>
+                    </div>
+                  </div>
+                  {(score.penalty_reversing > 0 || score.penalty_stopping > 0 || score.penalty_contact_barrier > 0 ||
+                    score.penalty_small_fire > 0 || score.penalty_failed_drive_off > 0 || score.penalty_large_fire > 0) && (
+                    <div className="bg-[#ef4444]/10 p-3 rounded mb-3">
+                      <p className="text-xs text-[#a1a1aa] mb-2">Penalties:</p>
+                      <div className="grid grid-cols-3 md:grid-cols-6 gap-2 text-xs">
+                        {score.penalty_reversing > 0 && <span className="text-[#ef4444]">Reversing: {score.penalty_reversing}</span>}
+                        {score.penalty_stopping > 0 && <span className="text-[#ef4444]">Stopping: {score.penalty_stopping}</span>}
+                        {score.penalty_contact_barrier > 0 && <span className="text-[#ef4444]">Barrier: {score.penalty_contact_barrier}</span>}
+                        {score.penalty_small_fire > 0 && <span className="text-[#ef4444]">Small Fire: {score.penalty_small_fire}</span>}
+                        {score.penalty_failed_drive_off > 0 && <span className="text-[#ef4444]">Failed Drive: {score.penalty_failed_drive_off}</span>}
+                        {score.penalty_large_fire > 0 && <span className="text-[#ef4444]">Large Fire: {score.penalty_large_fire}</span>}
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center">
+                    <div className="flex gap-4 text-sm">
+                      <span className="text-[#22c55e]">Subtotal: <span className="data-font font-bold">{score.score_subtotal}</span></span>
+                      <span className="text-[#ef4444]">Penalties: <span className="data-font font-bold">-{score.penalty_total}</span></span>
+                    </div>
+                    <Button onClick={() => startEdit(score)} size="sm" className="bg-[#0ea5e9] hover:bg-[#0284c7]">
+                      Edit Score
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
+          ))}
+          {scores.length === 0 && (
+            <p className="text-center text-[#a1a1aa] py-8">No scores submitted yet</p>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
