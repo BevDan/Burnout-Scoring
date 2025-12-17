@@ -33,6 +33,11 @@ security = HTTPBearer()
 JWT_SECRET = os.environ.get('JWT_SECRET', 'burnout-secret-key-change-in-production')
 JWT_ALGORITHM = 'HS256'
 
+# Rate limiting setup
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 # Models
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
