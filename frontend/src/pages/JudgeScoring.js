@@ -240,14 +240,20 @@ export default function JudgeScoring({ user, onLogout }) {
               disabled={!selectedRound}
             >
               <SelectTrigger className="bg-[#18181b] border-[#27272a] text-white h-14" data-testid="competitor-select">
-                <SelectValue placeholder="Choose a competitor" />
+                <SelectValue placeholder={!selectedRound ? "Select a round first" : competitors.length === 0 ? "No competitors available" : "Choose a competitor"} />
               </SelectTrigger>
               <SelectContent className="bg-[#18181b] border-[#27272a]">
-                {competitors.map((comp) => (
-                  <SelectItem key={comp.id} value={comp.id}>
-                    #{comp.car_number} - {comp.name} ({comp.class_name})
-                  </SelectItem>
-                ))}
+                {competitors.length === 0 ? (
+                  <div className="p-4 text-center text-[#a1a1aa]">
+                    No competitors found. Contact admin to add competitors.
+                  </div>
+                ) : (
+                  competitors.map((comp) => (
+                    <SelectItem key={comp.id} value={comp.id}>
+                      #{comp.car_number} - {comp.name} ({comp.class_name})
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>
