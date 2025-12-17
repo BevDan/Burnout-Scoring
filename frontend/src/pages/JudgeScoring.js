@@ -94,13 +94,13 @@ export default function JudgeScoring({ user, onLogout }) {
       scoreData.driving_skill +
       (scoreData.tyres_popped * 5);
 
-    let penalties = 0;
-    if (scoreData.penalty_reversing) penalties += 5;
-    if (scoreData.penalty_stopping) penalties += 5;
-    if (scoreData.penalty_contact_barrier) penalties += 5;
-    if (scoreData.penalty_small_fire) penalties += 5;
-    if (scoreData.penalty_failed_drive_off) penalties += 10;
-    if (scoreData.penalty_large_fire) penalties += 10;
+    const penalties = 
+      (scoreData.penalty_reversing * 5) +
+      (scoreData.penalty_stopping * 5) +
+      (scoreData.penalty_contact_barrier * 5) +
+      (scoreData.penalty_small_fire * 5) +
+      (scoreData.penalty_failed_drive_off * 10) +
+      (scoreData.penalty_large_fire * 10);
 
     return { subtotal, penalties, final: subtotal - penalties };
   };
