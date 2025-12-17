@@ -475,13 +475,91 @@ async def submit_score(score_create: ScoreCreate, current_user: User = Depends(g
     await db.scores.insert_one(doc)
     return score
 
-@api_router.get("/judge/scores", response_model=List[Score])
+@api_router.get("/judge/scores", response_model=List[ScoreWithDetails])
 async def get_judge_scores(current_user: User = Depends(get_current_user)):
     scores = await db.scores.find({"judge_id": current_user.id}, {"_id": 0}).to_list(1000)
+    
+    # Get competitors and rounds for enrichment
+    competitors = await db.competitors.find({}, {"_id": 0}).to_list(1000)
+    rounds = await db.rounds.find({}, {"_id": 0}).to_list(1000)
+    
+    competitors_dict = {c["id"]: c for c in competitors}
+    rounds_dict = {r["id"]: r for r in rounds}
+    
+    enriched_scores = []
     for score in scores:
         if isinstance(score.get('submitted_at'), str):
             score['submitted_at'] = datetime.fromisoformat(score['submitted_at'])
-    return scores
+        if score.get('edited_at') and isinstance(score['edited_at'], str):
+            score['edited_at'] = datetime.fromisoformat(score['edited_at'])
+        
+        competitor = competitors_dict.get(score["competitor_id"], {})
+        round_data = rounds_dict.get(score["round_id"], {})
+        
+        enriched_scores.append(ScoreWithDetails(
+            **score,
+            competitor_name=competitor.get("name", "Unknown"),
+            car_number=competitor.get("car_number", "?"),
+            round_name=round_data.get("name", "Unknown Round")
+        ))
+    
+    return enriched_scores
+
+@api_router.put("/judge/scores/{score_id}", response_model=Score)
+async def update_score(score_id: str, score_update: ScoreUpdate, current_user: User = Depends(get_current_user)):
+    # Get existing score
+    existing_score = await db.scores.find_one({"id": score_id}, {"_id": 0})
+    if not existing_score:
+        raise HTTPException(status_code=404, detail="Score not found")
+    
+    # Verify judge owns this score
+    if existing_score["judge_id"] != current_user.id:
+        raise HTTPException(status_code=403, detail="You can only edit your own scores")
+    
+    # Update only provided fields
+    update_data = {k: v for k, v in score_update.model_dump().items() if v is not None}
+    
+    if update_data:
+        # Recalculate scores with updated values
+        updated_score = {**existing_score, **update_data}
+        
+        score_subtotal = (
+            updated_score["instant_smoke"] +
+            updated_score["constant_smoke"] +
+            updated_score["volume_of_smoke"] +
+            updated_score["driving_skill"] +
+            (updated_score["tyres_popped"] * 5)
+        )
+        
+        penalty_total = (
+            (updated_score["penalty_reversing"] * 5) +
+            (updated_score["penalty_stopping"] * 5) +
+            (updated_score["penalty_contact_barrier"] * 5) +
+            (updated_score["penalty_small_fire"] * 5) +
+            (updated_score["penalty_failed_drive_off"] * 10) +
+            (updated_score["penalty_large_fire"] * 10)
+        )
+        
+        final_score = score_subtotal - penalty_total
+        
+        update_data["score_subtotal"] = score_subtotal
+        update_data["penalty_total"] = penalty_total
+        update_data["final_score"] = final_score
+        update_data["edited_at"] = datetime.now(timezone.utc).isoformat()
+        
+        await db.scores.update_one(
+            {"id": score_id},
+            {"$set": update_data}
+        )
+    
+    # Return updated score
+    updated = await db.scores.find_one({"id": score_id}, {"_id": 0})
+    if isinstance(updated.get('submitted_at'), str):
+        updated['submitted_at'] = datetime.fromisoformat(updated['submitted_at'])
+    if updated.get('edited_at') and isinstance(updated['edited_at'], str):
+        updated['edited_at'] = datetime.fromisoformat(updated['edited_at'])
+    
+    return Score(**updated)
 
 # Leaderboard
 @api_router.get("/leaderboard/{round_id}", response_model=List[LeaderboardEntry])
