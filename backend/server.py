@@ -97,8 +97,8 @@ class CompetitorWithClass(BaseModel):
     id: str
     name: str
     car_number: str
-    vehicle_info: str
-    plate: str
+    vehicle_info: Optional[str] = ""
+    plate: Optional[str] = ""
     class_id: str
     class_name: str
     created_at: datetime
