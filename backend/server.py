@@ -257,6 +257,29 @@ async def register(user_create: UserCreate, admin: User = Depends(require_admin)
     await db.users.insert_one(doc)
     return user
 
+@api_router.put("/auth/profile", response_model=User)
+async def update_profile(profile_update: ProfileUpdate, current_user: User = Depends(get_current_user)):
+    update_data = {}
+    
+    if profile_update.name:
+        update_data["name"] = profile_update.name
+    
+    if profile_update.password:
+        update_data["password_hash"] = bcrypt.hash(profile_update.password)
+    
+    if update_data:
+        await db.users.update_one(
+            {"id": current_user.id},
+            {"$set": update_data}
+        )
+    
+    # Return updated user
+    updated_user = await db.users.find_one({"id": current_user.id}, {"_id": 0, "password_hash": 0})
+    if isinstance(updated_user.get('created_at'), str):
+        updated_user['created_at'] = datetime.fromisoformat(updated_user['created_at'])
+    
+    return User(**updated_user)
+
 # Admin - Judge management
 @api_router.get("/admin/judges", response_model=List[User])
 async def get_judges(admin: User = Depends(require_admin)):
