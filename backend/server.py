@@ -126,6 +126,7 @@ class Score(BaseModel):
     penalty_total: int = 0
     final_score: int = 0
     submitted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    edited_at: Optional[datetime] = None
 
 class ScoreCreate(BaseModel):
     competitor_id: str
