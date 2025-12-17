@@ -10,10 +10,9 @@
   font-weight: 700;
 }
 
-/* Apply Roboto to all score-related numbers */
-.score-font {
+/* Apply Roboto to all data/score-related numbers */
+.data-font {
   font-family: 'Roboto', sans-serif !important;
-  font-weight: 500;
 }
 
 @layer base {
