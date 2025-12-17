@@ -408,19 +408,15 @@ async def submit_score(score_create: ScoreCreate, current_user: User = Depends(g
         (score_create.tyres_popped * 5)
     )
     
-    penalty_total = 0
-    if score_create.penalty_reversing:
-        penalty_total += 5
-    if score_create.penalty_stopping:
-        penalty_total += 5
-    if score_create.penalty_contact_barrier:
-        penalty_total += 5
-    if score_create.penalty_small_fire:
-        penalty_total += 5
-    if score_create.penalty_failed_drive_off:
-        penalty_total += 10
-    if score_create.penalty_large_fire:
-        penalty_total += 10
+    # Calculate penalties (cumulative)
+    penalty_total = (
+        (score_create.penalty_reversing * 5) +
+        (score_create.penalty_stopping * 5) +
+        (score_create.penalty_contact_barrier * 5) +
+        (score_create.penalty_small_fire * 5) +
+        (score_create.penalty_failed_drive_off * 10) +
+        (score_create.penalty_large_fire * 10)
+    )
     
     final_score = score_subtotal - penalty_total
     
