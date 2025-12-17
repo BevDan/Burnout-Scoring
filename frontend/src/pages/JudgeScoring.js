@@ -55,8 +55,10 @@ export default function JudgeScoring({ user, onLogout }) {
   const fetchRounds = async () => {
     try {
       const response = await axios.get(`${API}/admin/rounds`, getAuthHeaders());
-      // Handle rounds without status field - default to 'active'
-      const activeRounds = response.data.filter(r => (r.status || 'active') === 'active');
+      // Filter for active rounds - handle both 'round_status' (from API) and 'status' fields
+      const activeRounds = response.data.filter(r => 
+        (r.round_status || r.status || 'active') === 'active'
+      );
       setRounds(activeRounds);
     } catch (error) {
       toast.error('Failed to load rounds');
