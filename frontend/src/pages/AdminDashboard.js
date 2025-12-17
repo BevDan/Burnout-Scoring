@@ -455,6 +455,7 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
                 <div>
                   <p className="ui-font text-lg font-semibold text-white">{comp.name}</p>
                   <p className="text-sm text-[#a1a1aa]">{comp.vehicle_info}</p>
+                  <p className="text-sm text-[#22c55e] data-font">Plate: {comp.plate}</p>
                   <p className="text-xs text-[#f97316] mt-1">{comp.class_name}</p>
                 </div>
               </div>
