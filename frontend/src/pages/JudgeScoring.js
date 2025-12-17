@@ -370,50 +370,12 @@ export default function JudgeScoring({ user, onLogout }) {
         </div>
       </main>
 
-      <Dialog open={showReview} onOpenChange={setShowReview}>
-        <DialogContent className="bg-[#18181b] border-[#27272a] text-white max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="ui-font text-2xl">MY SUBMITTED SCORES</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            {myScores.map((score) => (
-              <div key={score.id} className="bg-[#09090b] p-4 rounded border border-[#27272a]">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <p className="ui-font text-lg font-bold text-white">Round: {score.round_id}</p>
-                    <p className="text-sm text-[#a1a1aa]">Competitor: {score.competitor_id}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="data-font text-3xl font-bold text-[#f97316]">{score.final_score}</p>
-                    <p className="text-xs text-[#a1a1aa]">{new Date(score.submitted_at).toLocaleString()}</p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                  <div>
-                    <span className="text-[#a1a1aa]">Instant Smoke:</span>
-                    <span className="ml-2 data-font text-white">{score.instant_smoke}</span>
-                  </div>
-                  <div>
-                    <span className="text-[#a1a1aa]">Constant Smoke:</span>
-                    <span className="ml-2 data-font text-white">{score.constant_smoke}</span>
-                  </div>
-                  <div>
-                    <span className="text-[#a1a1aa]">Volume:</span>
-                    <span className="ml-2 data-font text-white">{score.volume_of_smoke}</span>
-                  </div>
-                  <div>
-                    <span className="text-[#a1a1aa]">Driving:</span>
-                    <span className="ml-2 data-font text-white">{score.driving_skill}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-            {myScores.length === 0 && (
-              <p className="text-center text-[#a1a1aa] py-8">No scores submitted yet</p>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ScoreReviewDialog 
+        open={showReview} 
+        onOpenChange={setShowReview}
+        scores={myScores}
+        onScoreUpdated={fetchMyScores}
+      />
     </div>
   );
 }
