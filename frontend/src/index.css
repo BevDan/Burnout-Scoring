@@ -1,6 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Clear numeric font for car numbers - distinct 0/8, 1/l characters */
+.car-number-font {
+  font-family: 'Roboto Mono', monospace;
+  font-variant-numeric: tabular-nums slashed-zero;
+}
 
 @layer base {
   :root {
