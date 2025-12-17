@@ -366,7 +366,7 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
                     value={csvData}
                     onChange={(e) => setCsvData(e.target.value)}
                     className="w-full h-48 p-3 bg-[#09090b] border border-[#27272a] rounded text-white data-font text-sm"
-                    placeholder="name,car_number,vehicle_info,class_id&#10;John Doe,42,Ford Mustang,class-id-here&#10;Jane Smith,88,Chevy Camaro,class-id-here"
+                    placeholder="name,car_number,vehicle_info,plate,class_id&#10;John Doe,42,Ford Mustang,BURNOUT1,class-id-here&#10;Jane Smith,88,Chevy Camaro,SMOKEY,class-id-here"
                     data-testid="csv-textarea"
                   />
                 </div>
