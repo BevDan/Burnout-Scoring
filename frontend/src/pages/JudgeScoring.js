@@ -143,6 +143,33 @@ export default function JudgeScoring({ user, onLogout }) {
     }
   };
 
+  const handleProfileUpdate = async () => {
+    try {
+      const updateData = {};
+      if (profileData.name) updateData.name = profileData.name;
+      if (profileData.password) updateData.password = profileData.password;
+
+      if (Object.keys(updateData).length === 0) {
+        toast.error('Please provide name or password to update');
+        return;
+      }
+
+      await axios.put(`${API}/auth/profile`, updateData, getAuthHeaders());
+      toast.success('Profile updated successfully');
+      setProfileOpen(false);
+      setProfileData({ name: '', password: '' });
+      
+      if (updateData.name) {
+        const userData = JSON.parse(localStorage.getItem('user'));
+        userData.name = updateData.name;
+        localStorage.setItem('user', JSON.stringify(userData));
+        window.location.reload();
+      }
+    } catch (error) {
+      toast.error('Failed to update profile');
+    }
+  };
+
   const totals = calculateTotals();
 
   return (
