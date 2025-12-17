@@ -228,11 +228,11 @@ async def require_admin(current_user: User = Depends(get_current_user)) -> User:
 @api_router.post("/auth/login", response_model=LoginResponse)
 @limiter.limit("5/minute")
 async def login(request: Request, login_request: LoginRequest):
-    user_data = await db.users.find_one({"username": request.username}, {"_id": 0})
+    user_data = await db.users.find_one({"username": login_request.username}, {"_id": 0})
     if not user_data:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    if not bcrypt.verify(request.password, user_data["password_hash"]):
+    if not bcrypt.verify(login_request.password, user_data["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     token_payload = {
