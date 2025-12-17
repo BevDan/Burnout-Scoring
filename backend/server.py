@@ -609,6 +609,78 @@ async def get_leaderboard(round_id: str, class_id: Optional[str] = None, current
     return leaderboard
 
 # Export
+@api_router.get("/export/all-data")
+async def export_all_data(admin: User = Depends(require_admin)):
+    # Export all data including competitors, rounds, classes, judges, and all scores
+    competitors = await db.competitors.find({}, {"_id": 0}).to_list(10000)
+    rounds = await db.rounds.find({}, {"_id": 0}).to_list(10000)
+    classes = await db.classes.find({}, {"_id": 0}).to_list(10000)
+    judges = await db.users.find({"role": "judge"}, {"_id": 0, "password_hash": 0}).to_list(10000)
+    scores = await db.scores.find({}, {"_id": 0}).to_list(10000)
+    
+    # Create dictionaries for lookups
+    competitors_dict = {c["id"]: c for c in competitors}
+    rounds_dict = {r["id"]: r for r in rounds}
+    classes_dict = {c["id"]: c for c in classes}
+    
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Write comprehensive header
+    writer.writerow([
+        "Score ID", "Judge Name", "Round Name", "Round Date", "Competitor Name", 
+        "Car Number", "Plate", "Vehicle", "Class", "Instant Smoke", "Constant Smoke", 
+        "Volume Smoke", "Driving Skill", "Tyres Popped", "Tyres Points",
+        "Reversing Count", "Stopping Count", "Barrier Contact Count", "Small Fire Count",
+        "Failed Drive Off Count", "Large Fire Count",
+        "Score Subtotal", "Penalty Total", "Final Score", 
+        "Submitted At", "Edited At", "Was Edited"
+    ])
+    
+    for score in scores:
+        comp = competitors_dict.get(score["competitor_id"], {})
+        round_data = rounds_dict.get(score["round_id"], {})
+        class_name = classes_dict.get(comp.get("class_id", ""), {}).get("name", "Unknown")
+        
+        was_edited = "Yes" if score.get("edited_at") else "No"
+        
+        writer.writerow([
+            score["id"],
+            score["judge_name"],
+            round_data.get("name", "Unknown"),
+            round_data.get("date", ""),
+            comp.get("name", "Unknown"),
+            comp.get("car_number", ""),
+            comp.get("plate", ""),
+            comp.get("vehicle_info", ""),
+            class_name,
+            score["instant_smoke"],
+            score["constant_smoke"],
+            score["volume_of_smoke"],
+            score["driving_skill"],
+            score["tyres_popped"],
+            score["tyres_popped"] * 5,
+            score.get("penalty_reversing", 0),
+            score.get("penalty_stopping", 0),
+            score.get("penalty_contact_barrier", 0),
+            score.get("penalty_small_fire", 0),
+            score.get("penalty_failed_drive_off", 0),
+            score.get("penalty_large_fire", 0),
+            score["score_subtotal"],
+            score["penalty_total"],
+            score["final_score"],
+            score["submitted_at"],
+            score.get("edited_at", ""),
+            was_edited
+        ])
+    
+    output.seek(0)
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=burnout_scoring_all_data.csv"}
+    )
+
 @api_router.get("/export/scores/{round_id}")
 async def export_scores(round_id: str, admin: User = Depends(require_admin)):
     scores = await db.scores.find({"round_id": round_id}, {"_id": 0}).to_list(10000)
