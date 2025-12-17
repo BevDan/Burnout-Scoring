@@ -683,7 +683,7 @@ function RoundsPanel({ rounds, onRefresh }) {
               </div>
               <div>
                 <Label>Status</Label>
-                <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+                <Select value={formData.round_status} onValueChange={(value) => setFormData({ ...formData, round_status: value })}>
                   <SelectTrigger className="bg-[#09090b] border-[#27272a]" data-testid="round-status-select">
                     <SelectValue />
                   </SelectTrigger>
@@ -725,7 +725,7 @@ function RoundsPanel({ rounds, onRefresh }) {
               </div>
               <div>
                 <Label>Status</Label>
-                <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+                <Select value={formData.round_status} onValueChange={(value) => setFormData({ ...formData, round_status: value })}>
                   <SelectTrigger className="bg-[#09090b] border-[#27272a]">
                     <SelectValue />
                   </SelectTrigger>
