@@ -475,7 +475,8 @@ async def get_competitors_for_round(round_id: str, current_user: User = Depends(
     return result
 
 @api_router.post("/judge/scores", response_model=Score)
-async def submit_score(score_create: ScoreCreate, current_user: User = Depends(get_current_user)):
+@limiter.limit("10/minute")
+async def submit_score(request: Request, score_create: ScoreCreate, current_user: User = Depends(get_current_user)):
     # Calculate scores
     score_subtotal = (
         score_create.instant_smoke +
