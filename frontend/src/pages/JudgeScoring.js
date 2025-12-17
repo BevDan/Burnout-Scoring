@@ -587,7 +587,7 @@ function ScoreReviewDialog({ open, onOpenChange, scores, onScoreUpdated }) {
               <div className="flex justify-between items-start mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="data-font text-2xl font-bold text-[#f97316]">#{score.car_number}</span>
+                    <span className="car-number-font text-2xl font-bold text-[#f97316]">#{score.car_number}</span>
                     <div>
                       <p className="ui-font text-xl font-bold text-white">{score.competitor_name}</p>
                       <p className="text-sm text-[#a1a1aa]">{score.round_name}</p>
