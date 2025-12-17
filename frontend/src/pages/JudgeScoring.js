@@ -127,12 +127,12 @@ export default function JudgeScoring({ user, onLogout }) {
         volume_of_smoke: 0,
         driving_skill: 0,
         tyres_popped: 0,
-        penalty_reversing: false,
-        penalty_stopping: false,
-        penalty_contact_barrier: false,
-        penalty_small_fire: false,
-        penalty_failed_drive_off: false,
-        penalty_large_fire: false
+        penalty_reversing: 0,
+        penalty_stopping: 0,
+        penalty_contact_barrier: 0,
+        penalty_small_fire: 0,
+        penalty_failed_drive_off: 0,
+        penalty_large_fire: 0
       });
       setSelectedCompetitor(null);
       fetchMyScores();
