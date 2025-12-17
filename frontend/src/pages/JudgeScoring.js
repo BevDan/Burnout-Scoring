@@ -256,7 +256,7 @@ export default function JudgeScoring({ user, onLogout }) {
         {selectedCompetitor && (
           <div className="glass-panel p-6 rounded-lg border-l-4 border-[#f97316] space-y-4">
             <div className="flex items-center gap-3">
-              <span className="data-font text-4xl font-bold text-[#f97316]">#{selectedCompetitor.car_number}</span>
+              <span className="car-number-font text-4xl font-bold text-[#f97316]">#{selectedCompetitor.car_number}</span>
               <div>
                 <p className="ui-font text-2xl font-bold text-white">{selectedCompetitor.name}</p>
                 <span className="inline-block mt-1 px-3 py-1 bg-[#f97316] text-white text-xs font-bold rounded">
