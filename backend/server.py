@@ -115,13 +115,13 @@ class Score(BaseModel):
     constant_smoke: int = 0  # 0-20
     volume_of_smoke: int = 0  # 0-20
     driving_skill: int = 0  # 0-40
-    tyres_popped: int = 0  # count
-    penalty_reversing: bool = False
-    penalty_stopping: bool = False
-    penalty_contact_barrier: bool = False
-    penalty_small_fire: bool = False
-    penalty_failed_drive_off: bool = False
-    penalty_large_fire: bool = False
+    tyres_popped: int = 0  # count (max 2)
+    penalty_reversing: int = 0  # count
+    penalty_stopping: int = 0  # count
+    penalty_contact_barrier: int = 0  # count
+    penalty_small_fire: int = 0  # count
+    penalty_failed_drive_off: int = 0  # count
+    penalty_large_fire: int = 0  # count
     score_subtotal: int = 0
     penalty_total: int = 0
     final_score: int = 0
@@ -135,12 +135,12 @@ class ScoreCreate(BaseModel):
     volume_of_smoke: int = 0
     driving_skill: int = 0
     tyres_popped: int = 0
-    penalty_reversing: bool = False
-    penalty_stopping: bool = False
-    penalty_contact_barrier: bool = False
-    penalty_small_fire: bool = False
-    penalty_failed_drive_off: bool = False
-    penalty_large_fire: bool = False
+    penalty_reversing: int = 0
+    penalty_stopping: int = 0
+    penalty_contact_barrier: int = 0
+    penalty_small_fire: int = 0
+    penalty_failed_drive_off: int = 0
+    penalty_large_fire: int = 0
 
 class LeaderboardEntry(BaseModel):
     competitor_id: str
