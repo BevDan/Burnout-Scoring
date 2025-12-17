@@ -60,6 +60,31 @@ export default function AdminDashboard({ user, onLogout }) {
           </div>
           <div className="flex gap-3">
             <Button
+              onClick={async () => {
+                try {
+                  const response = await axios.get(`${API}/export/all-data`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+                    responseType: 'blob'
+                  });
+                  const url = window.URL.createObjectURL(new Blob([response.data]));
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.setAttribute('download', 'burnout_scoring_all_data.csv');
+                  document.body.appendChild(link);
+                  link.click();
+                  link.remove();
+                  toast.success('Data exported successfully');
+                } catch (error) {
+                  toast.error('Failed to export data');
+                }
+              }}
+              className="bg-[#22c55e] hover:bg-[#16a34a] text-white"
+              data-testid="download-all-data-button"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Download All Data
+            </Button>
+            <Button
               onClick={() => navigate('/leaderboard')}
               className="bg-[#0ea5e9] hover:bg-[#0284c7] text-white"
               data-testid="view-leaderboard-button"
