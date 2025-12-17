@@ -758,7 +758,7 @@ function RoundsPanel({ rounds, onRefresh }) {
                 <span className={`inline-block mt-2 px-3 py-1 rounded text-xs font-bold ${
                   round.status === 'active' ? 'bg-[#22c55e] text-black' : 'bg-[#71717a] text-white'
                 }`}>
-                  {round.status.toUpperCase()}
+                  {(round.status || 'active').toUpperCase()}
                 </span>
               </div>
               <div className="flex gap-2">
