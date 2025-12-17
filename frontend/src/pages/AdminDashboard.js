@@ -756,9 +756,9 @@ function RoundsPanel({ rounds, onRefresh }) {
                 <p className="ui-font text-lg font-semibold text-white">{round.name}</p>
                 <p className="text-sm text-[#a1a1aa]">{round.date}</p>
                 <span className={`inline-block mt-2 px-3 py-1 rounded text-xs font-bold ${
-                  (round.status || 'active') === 'active' ? 'bg-[#22c55e] text-black' : 'bg-[#71717a] text-white'
+                  (round.round_status || 'active') === 'active' ? 'bg-[#22c55e] text-black' : 'bg-[#71717a] text-white'
                 }`}>
-                  {(round.status || 'active').toUpperCase()}
+                  {(round.round_status || 'active').toUpperCase()}
                 </span>
               </div>
               <div className="flex gap-2">
