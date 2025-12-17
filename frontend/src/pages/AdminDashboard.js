@@ -636,6 +636,14 @@ function RoundsPanel({ rounds, onRefresh }) {
             </div>
             <div className="flex gap-2">
               <Button
+                onClick={() => startEdit(round)}
+                className="bg-[#f59e0b] hover:bg-[#d97706]"
+                size="sm"
+                data-testid={`edit-round-${round.id}`}
+              >
+                Edit
+              </Button>
+              <Button
                 onClick={() => handleExport(round.id)}
                 className="bg-[#0ea5e9] hover:bg-[#0284c7]"
                 size="sm"
