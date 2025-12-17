@@ -1,13 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Clear numeric font for car numbers - distinct 0/8, 1/l characters */
+/* Clear numeric font for car numbers - distinct 0/8, 1/l characters 
+   JetBrains Mono has excellent number distinction with dotted zero */
 .car-number-font {
-  font-family: 'Roboto Mono', monospace;
+  font-family: 'JetBrains Mono', 'Courier New', monospace !important;
   font-variant-numeric: tabular-nums slashed-zero;
+  letter-spacing: 0.05em;
 }
 
 @layer base {
