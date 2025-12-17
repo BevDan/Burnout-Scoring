@@ -81,8 +81,9 @@ export default function JudgeScoring({ user, onLogout }) {
     setScoreData({ ...scoreData, [field]: newValue });
   };
 
-  const togglePenalty = (field) => {
-    setScoreData({ ...scoreData, [field]: !scoreData[field] });
+  const updatePenalty = (field, value) => {
+    const newValue = Math.max(0, value);
+    setScoreData({ ...scoreData, [field]: newValue });
   };
 
   const calculateTotals = () => {
