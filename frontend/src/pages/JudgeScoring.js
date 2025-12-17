@@ -251,7 +251,7 @@ export default function JudgeScoring({ user, onLogout }) {
                 ) : (
                   competitors.map((comp) => (
                     <SelectItem key={comp.id} value={comp.id}>
-                      #{comp.car_number} - {comp.name} ({comp.class_name})
+                      <span className="car-number-font">#{comp.car_number}</span> - {comp.name} ({comp.class_name})
                     </SelectItem>
                   ))
                 )}
