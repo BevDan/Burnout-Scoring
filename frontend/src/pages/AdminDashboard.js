@@ -77,6 +77,31 @@ export default function AdminDashboard({ user, onLogout }) {
     }
   };
 
+  const handleReset = async (type) => {
+    const confirmTexts = {
+      scores: 'DELETE SCORES',
+      competition: 'DELETE COMPETITION',
+      full: 'DELETE ALL'
+    };
+    
+    if (resetConfirm !== confirmTexts[type]) {
+      toast.error(`Please type "${confirmTexts[type]}" to confirm`);
+      return;
+    }
+    
+    setIsResetting(true);
+    try {
+      const response = await axios.delete(`${API}/admin/reset/${type}`, getAuthHeaders());
+      toast.success(response.data.message);
+      setResetConfirm('');
+      fetchAllData(); // Refresh all data
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Reset failed');
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#09090b] noise-overlay" data-testid="admin-dashboard">
       <header className="bg-[#18181b] border-b border-[#27272a] px-6 py-4">
