@@ -202,6 +202,15 @@ export default function JudgeScoring({ user, onLogout }) {
             >
               <Trophy className="w-4 h-4" />
             </Button>
+            <Button 
+              onClick={() => setProfileOpen(true)}
+              variant="outline" 
+              className="border-[#27272a]" 
+              size="sm"
+              data-testid="judge-settings-button"
+            >
+              <Settings className="w-4 h-4" />
+            </Button>
             <Button onClick={onLogout} variant="outline" className="border-[#27272a]" size="sm" data-testid="logout-button">
               <LogOut className="w-4 h-4" />
             </Button>
