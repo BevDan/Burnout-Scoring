@@ -583,14 +583,14 @@ function RoundsPanel({ rounds, onRefresh }) {
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editingRound, setEditingRound] = useState(null);
-  const [formData, setFormData] = useState({ name: '', date: '', status: 'active' });
+  const [formData, setFormData] = useState({ name: '', date: '', round_status: 'active' });
 
   const handleCreate = async () => {
     try {
       await axios.post(`${API}/admin/rounds`, formData, getAuthHeaders());
       toast.success('Round created successfully');
       setOpen(false);
-      setFormData({ name: '', date: '', status: 'active' });
+      setFormData({ name: '', date: '', round_status: 'active' });
       onRefresh();
     } catch (error) {
       toast.error('Failed to create round');
