@@ -25,6 +25,8 @@ export default function AdminDashboard({ user, onLogout }) {
   const [rounds, setRounds] = useState([]);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileData, setProfileData] = useState({ name: '', password: '' });
+  const [resetConfirm, setResetConfirm] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
 
   useEffect(() => {
     fetchAllData();
