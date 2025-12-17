@@ -53,6 +53,10 @@ class LoginResponse(BaseModel):
     token: str
     user: User
 
+class ProfileUpdate(BaseModel):
+    name: Optional[str] = None
+    password: Optional[str] = None
+
 class CompetitionClass(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
