@@ -1,16 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* Clear numeric font for car numbers - distinct 0/8, 1/l characters 
-   Share Tech Mono has a very distinctive slashed zero */
+   Fira Code has dotted zero and excellent character distinction */
 .car-number-font {
-  font-family: 'Share Tech Mono', 'Lucida Console', monospace !important;
+  font-family: 'Fira Code', 'Consolas', 'Monaco', monospace !important;
   font-variant-numeric: tabular-nums slashed-zero;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   font-weight: 700;
+  font-feature-settings: "zero" 1;  /* Enable slashed/dotted zero */
 }
 
 @layer base {
