@@ -599,7 +599,7 @@ function RoundsPanel({ rounds, onRefresh }) {
 
   const startEdit = (round) => {
     setEditingRound(round);
-    setFormData({ name: round.name, date: round.date, status: round.status });
+    setFormData({ name: round.name, date: round.date, status: round.status || 'active' });
     setEditOpen(true);
   };
 
@@ -756,7 +756,7 @@ function RoundsPanel({ rounds, onRefresh }) {
                 <p className="ui-font text-lg font-semibold text-white">{round.name}</p>
                 <p className="text-sm text-[#a1a1aa]">{round.date}</p>
                 <span className={`inline-block mt-2 px-3 py-1 rounded text-xs font-bold ${
-                  round.status === 'active' ? 'bg-[#22c55e] text-black' : 'bg-[#71717a] text-white'
+                  (round.status || 'active') === 'active' ? 'bg-[#22c55e] text-black' : 'bg-[#71717a] text-white'
                 }`}>
                   {(round.status || 'active').toUpperCase()}
                 </span>
