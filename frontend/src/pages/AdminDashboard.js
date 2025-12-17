@@ -599,7 +599,7 @@ function RoundsPanel({ rounds, onRefresh }) {
 
   const startEdit = (round) => {
     setEditingRound(round);
-    setFormData({ name: round.name, date: round.date, status: round.status || 'active' });
+    setFormData({ name: round.name, date: round.date, round_status: round.round_status || 'active' });
     setEditOpen(true);
   };
 
@@ -609,7 +609,7 @@ function RoundsPanel({ rounds, onRefresh }) {
       toast.success('Round updated successfully');
       setEditOpen(false);
       setEditingRound(null);
-      setFormData({ name: '', date: '', status: 'active' });
+      setFormData({ name: '', date: '', round_status: 'active' });
       onRefresh();
     } catch (error) {
       toast.error('Failed to update round');
