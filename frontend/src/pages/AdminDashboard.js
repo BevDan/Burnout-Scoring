@@ -620,6 +620,48 @@ function RoundsPanel({ rounds, onRefresh }) {
             </div>
           </DialogContent>
         </Dialog>
+
+        <Dialog open={editOpen} onOpenChange={setEditOpen}>
+          <DialogContent className="bg-[#18181b] border-[#27272a] text-white">
+            <DialogHeader>
+              <DialogTitle className="ui-font text-xl">Edit Round</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Round Name</Label>
+                <Input
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="bg-[#09090b] border-[#27272a]"
+                />
+              </div>
+              <div>
+                <Label>Date</Label>
+                <Input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  className="bg-[#09090b] border-[#27272a]"
+                />
+              </div>
+              <div>
+                <Label>Status</Label>
+                <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+                  <SelectTrigger className="bg-[#09090b] border-[#27272a]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#18181b] border-[#27272a]">
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button onClick={handleEdit} className="w-full btn-primary">
+                Update Round
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="space-y-3">
