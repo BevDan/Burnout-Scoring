@@ -425,7 +425,7 @@ function ScoreInput({ label, value, max, onChange, points, testId }) {
         <label className="ui-font text-lg font-semibold tracking-wide text-white">{label}</label>
         <span className="data-font text-sm text-[#a1a1aa]">Max: {max}</span>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 mb-3">
         <button
           onClick={() => onChange(value - 1)}
           className="w-16 h-16 bg-[#27272a] hover:bg-[#3f3f46] rounded text-white text-2xl font-bold transition-colors"
@@ -447,6 +447,18 @@ function ScoreInput({ label, value, max, onChange, points, testId }) {
           <Plus className="w-6 h-6 mx-auto" />
         </button>
       </div>
+      <input
+        type="range"
+        min="0"
+        max={max}
+        value={value}
+        onChange={(e) => onChange(parseInt(e.target.value))}
+        className="w-full h-2 bg-[#27272a] rounded-lg appearance-none cursor-pointer slider"
+        data-testid={`${testId}-slider`}
+        style={{
+          background: `linear-gradient(to right, #f97316 0%, #f97316 ${(value/max)*100}%, #27272a ${(value/max)*100}%, #27272a 100%)`
+        }}
+      />
     </div>
   );
 }
