@@ -23,6 +23,8 @@ export default function AdminDashboard({ user, onLogout }) {
   const [classes, setClasses] = useState([]);
   const [competitors, setCompetitors] = useState([]);
   const [rounds, setRounds] = useState([]);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [profileData, setProfileData] = useState({ name: '', password: '' });
 
   useEffect(() => {
     fetchAllData();
