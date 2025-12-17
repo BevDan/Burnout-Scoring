@@ -216,7 +216,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         return User(**user_data)
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=401, detail="Invalid token")
 
 async def require_admin(current_user: User = Depends(get_current_user)) -> User:
