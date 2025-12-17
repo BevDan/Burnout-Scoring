@@ -165,6 +165,46 @@ export default function AdminDashboard({ user, onLogout }) {
           </TabsContent>
         </Tabs>
       </main>
+
+      <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
+        <DialogContent className="bg-[#18181b] border-[#27272a] text-white">
+          <DialogHeader>
+            <DialogTitle className="ui-font text-xl">Profile Settings</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="bg-[#09090b] p-3 rounded border border-[#27272a]">
+              <p className="text-sm text-[#a1a1aa]">Username</p>
+              <p className="text-white data-font">{user.username}</p>
+            </div>
+            <div>
+              <Label>Display Name</Label>
+              <Input
+                value={profileData.name}
+                onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                placeholder={user.name}
+                className="bg-[#09090b] border-[#27272a]"
+                data-testid="profile-name-input"
+              />
+              <p className="text-xs text-[#a1a1aa] mt-1">Leave blank to keep current: {user.name}</p>
+            </div>
+            <div>
+              <Label>New Password</Label>
+              <Input
+                type="password"
+                value={profileData.password}
+                onChange={(e) => setProfileData({ ...profileData, password: e.target.value })}
+                placeholder="Enter new password"
+                className="bg-[#09090b] border-[#27272a]"
+                data-testid="profile-password-input"
+              />
+              <p className="text-xs text-[#a1a1aa] mt-1">Leave blank to keep current password</p>
+            </div>
+            <Button onClick={handleProfileUpdate} className="w-full btn-primary" data-testid="update-profile-button">
+              Update Profile
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
