@@ -308,7 +308,7 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
       await axios.post(`${API}/admin/competitors`, formData, getAuthHeaders());
       toast.success('Competitor created successfully');
       setOpen(false);
-      setFormData({ name: '', car_number: '', vehicle_info: '', class_id: '' });
+      setFormData({ name: '', car_number: '', vehicle_info: '', plate: '', class_id: '' });
       onRefresh();
     } catch (error) {
       toast.error('Failed to create competitor');
