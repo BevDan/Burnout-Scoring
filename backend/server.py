@@ -108,7 +108,7 @@ class Round(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     date: str
-    status: str = "active"  # active or completed
+    round_status: str = "active"  # active or completed
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class RoundCreate(BaseModel):
