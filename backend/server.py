@@ -371,6 +371,7 @@ async def create_competitor(competitor_create: CompetitorCreate, admin: User = D
     return competitor
 
 @api_router.post("/admin/competitors/bulk")
+@limiter.limit("2/minute")
 async def bulk_import_competitors(request: Request, admin: User = Depends(require_admin)):
     try:
         csv_data = await request.body()
