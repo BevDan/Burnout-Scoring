@@ -361,7 +361,7 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label>CSV Format: name,car_number,vehicle_info,class_id</Label>
+                  <Label>CSV Format: name,car_number,vehicle_info,plate,class_id</Label>
                   <textarea
                     value={csvData}
                     onChange={(e) => setCsvData(e.target.value)}
