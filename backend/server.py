@@ -86,6 +86,7 @@ class CompetitorWithClass(BaseModel):
     name: str
     car_number: str
     vehicle_info: str
+    plate: str
     class_id: str
     class_name: str
     created_at: datetime
