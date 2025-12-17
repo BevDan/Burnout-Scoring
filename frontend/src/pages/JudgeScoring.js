@@ -297,40 +297,46 @@ export default function JudgeScoring({ user, onLogout }) {
           </h2>
 
           <div className="grid md:grid-cols-2 gap-3">
-            <PenaltyToggle
-              label="Reversing (-5)"
-              active={scoreData.penalty_reversing}
-              onToggle={() => togglePenalty('penalty_reversing')}
+            <PenaltyCounter
+              label="Reversing"
+              points={5}
+              value={scoreData.penalty_reversing}
+              onChange={(v) => updatePenalty('penalty_reversing', v)}
               testId="penalty-reversing"
             />
-            <PenaltyToggle
-              label="Stopping (-5)"
-              active={scoreData.penalty_stopping}
-              onToggle={() => togglePenalty('penalty_stopping')}
+            <PenaltyCounter
+              label="Stopping"
+              points={5}
+              value={scoreData.penalty_stopping}
+              onChange={(v) => updatePenalty('penalty_stopping', v)}
               testId="penalty-stopping"
             />
-            <PenaltyToggle
-              label="Contact with Barrier (-5)"
-              active={scoreData.penalty_contact_barrier}
-              onToggle={() => togglePenalty('penalty_contact_barrier')}
+            <PenaltyCounter
+              label="Contact with Barrier"
+              points={5}
+              value={scoreData.penalty_contact_barrier}
+              onChange={(v) => updatePenalty('penalty_contact_barrier', v)}
               testId="penalty-contact-barrier"
             />
-            <PenaltyToggle
-              label="Small Fire (-5)"
-              active={scoreData.penalty_small_fire}
-              onToggle={() => togglePenalty('penalty_small_fire')}
+            <PenaltyCounter
+              label="Small Fire"
+              points={5}
+              value={scoreData.penalty_small_fire}
+              onChange={(v) => updatePenalty('penalty_small_fire', v)}
               testId="penalty-small-fire"
             />
-            <PenaltyToggle
-              label="Failed to Drive Off Pad (-10)"
-              active={scoreData.penalty_failed_drive_off}
-              onToggle={() => togglePenalty('penalty_failed_drive_off')}
+            <PenaltyCounter
+              label="Failed to Drive Off Pad"
+              points={10}
+              value={scoreData.penalty_failed_drive_off}
+              onChange={(v) => updatePenalty('penalty_failed_drive_off', v)}
               testId="penalty-failed-drive-off"
             />
-            <PenaltyToggle
-              label="Large Fire (-10)"
-              active={scoreData.penalty_large_fire}
-              onToggle={() => togglePenalty('penalty_large_fire')}
+            <PenaltyCounter
+              label="Large Fire"
+              points={10}
+              value={scoreData.penalty_large_fire}
+              onChange={(v) => updatePenalty('penalty_large_fire', v)}
               testId="penalty-large-fire"
             />
           </div>
