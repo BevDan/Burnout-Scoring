@@ -502,6 +502,8 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
 
 function RoundsPanel({ rounds, onRefresh }) {
   const [open, setOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editingRound, setEditingRound] = useState(null);
   const [formData, setFormData] = useState({ name: '', date: '', status: 'active' });
 
   const handleCreate = async () => {
@@ -513,6 +515,25 @@ function RoundsPanel({ rounds, onRefresh }) {
       onRefresh();
     } catch (error) {
       toast.error('Failed to create round');
+    }
+  };
+
+  const startEdit = (round) => {
+    setEditingRound(round);
+    setFormData({ name: round.name, date: round.date, status: round.status });
+    setEditOpen(true);
+  };
+
+  const handleEdit = async () => {
+    try {
+      await axios.put(`${API}/admin/rounds/${editingRound.id}`, formData, getAuthHeaders());
+      toast.success('Round updated successfully');
+      setEditOpen(false);
+      setEditingRound(null);
+      setFormData({ name: '', date: '', status: 'active' });
+      onRefresh();
+    } catch (error) {
+      toast.error('Failed to update round');
     }
   };
 
