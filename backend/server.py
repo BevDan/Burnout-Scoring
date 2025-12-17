@@ -308,6 +308,7 @@ async def bulk_import_competitors(request: Request, admin: User = Depends(requir
                 name=row.get('name', ''),
                 car_number=row.get('car_number', ''),
                 vehicle_info=row.get('vehicle_info', ''),
+                plate=row.get('plate', ''),
                 class_id=row.get('class_id', '')
             )
             doc = competitor.model_dump()
