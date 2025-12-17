@@ -222,15 +222,24 @@ export default function JudgeScoring({ user, onLogout }) {
         </div>
 
         {selectedCompetitor && (
-          <div className="glass-panel p-4 rounded-lg border-l-4 border-[#f97316]">
+          <div className="glass-panel p-6 rounded-lg border-l-4 border-[#f97316] space-y-4">
             <div className="flex items-center gap-3">
               <span className="data-font text-4xl font-bold text-[#f97316]">#{selectedCompetitor.car_number}</span>
               <div>
                 <p className="ui-font text-2xl font-bold text-white">{selectedCompetitor.name}</p>
-                <p className="text-[#a1a1aa]">{selectedCompetitor.vehicle_info}</p>
                 <span className="inline-block mt-1 px-3 py-1 bg-[#f97316] text-white text-xs font-bold rounded">
                   {selectedCompetitor.class_name}
                 </span>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-[#18181b] p-3 rounded border border-[#27272a]">
+                <label className="text-xs text-[#a1a1aa] uppercase block mb-1">Vehicle</label>
+                <p className="text-white">{selectedCompetitor.vehicle_info}</p>
+              </div>
+              <div className="bg-[#18181b] p-3 rounded border border-[#27272a]">
+                <label className="text-xs text-[#a1a1aa] uppercase block mb-1">Plate</label>
+                <p className="text-[#22c55e] data-font font-semibold">{selectedCompetitor.plate}</p>
               </div>
             </div>
           </div>
