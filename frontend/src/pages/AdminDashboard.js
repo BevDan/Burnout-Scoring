@@ -555,7 +555,7 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
           <div key={comp.id} className="bg-[#18181b] p-4 rounded border-l-4 border-[#f97316] flex justify-between items-center">
             <div>
               <div className="flex items-center gap-3">
-                <span className="data-font text-2xl font-bold text-[#f97316]">#{comp.car_number}</span>
+                <span className="car-number-font text-2xl font-bold text-[#f97316]">#{comp.car_number}</span>
                 <div>
                   <p className="ui-font text-lg font-semibold text-white">{comp.name}</p>
                   <p className="text-sm text-[#a1a1aa]">{comp.vehicle_info}</p>
