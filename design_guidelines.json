@@ -1,0 +1,158 @@
+{
+  "identity": {
+    "name": "Burnout Scorekeeper",
+    "persona": "The Pit Boss",
+    "vibe": "High-Octane, Precision Telemetry, Dark Mode Only",
+    "principles": [
+      "Speed is Safety: Judges must score in seconds.",
+      "Contrast is King: Sunlight glare is the enemy. High contrast always.",
+      "Data as Art: Scores are the hero. Make them big.",
+      "Asphalt & Neon: The aesthetic is burnt rubber and digital timing boards."
+    ]
+  },
+  "typography": {
+    "headings": {
+      "family": "Unbounded, sans-serif",
+      "usage": "Page titles, Score totals, Leaderboard ranks",
+      "weights": ["700", "900"],
+      "letterSpacing": "tracking-tighter"
+    },
+    "ui_labels": {
+      "family": "Rajdhani, sans-serif",
+      "usage": "Button labels, Input headers, Table headers",
+      "weights": ["600", "700"],
+      "letterSpacing": "tracking-wide"
+    },
+    "data": {
+      "family": "JetBrains Mono, monospace",
+      "usage": "Timers, Raw scores, Penalties, IDs",
+      "weights": ["400", "500"]
+    },
+    "body": {
+      "family": "Inter, sans-serif",
+      "usage": "Instructions, Admin text",
+      "weights": ["400"]
+    }
+  },
+  "colors": {
+    "palette": {
+      "background": "#09090b",
+      "surface": "#18181b",
+      "surface_highlight": "#27272a",
+      "primary": "#f97316",
+      "primary_glow": "rgba(249, 115, 22, 0.5)",
+      "secondary": "#0ea5e9",
+      "success": "#22c55e",
+      "danger": "#ef4444",
+      "text_primary": "#ffffff",
+      "text_secondary": "#a1a1aa",
+      "border": "#27272a"
+    },
+    "usage_rules": {
+      "gradients": "Use subtle linear gradients for buttons (Orange to Red). Avoid full screen gradients.",
+      "borders": "Active elements get a 1px glowing border (Primary color). Inactive get Zinc-800.",
+      "glass": "Use backdrop-blur-xl with bg-black/60 for overlays (Scoring panels)."
+    }
+  },
+  "layout_strategy": {
+    "judge_interface": {
+      "type": "The Pit Board",
+      "grid": "Single column mobile, 2-column tablet.",
+      "spacing": "Massive touch targets (min-height: 64px).",
+      "focus": "Current Competitor & Score Inputs occupy 90% of screen."
+    },
+    "admin_dashboard": {
+      "type": "The Control Tower",
+      "grid": "Bento Grid (Grid-cols-12).",
+      "density": "High. Use tables with sticky headers.",
+      "panels": [
+        "Live Scoring Feed (Col-span-4)",
+        "Competitor Queue (Col-span-4)",
+        "Leaderboard Preview (Col-span-4)"
+      ]
+    },
+    "leaderboard": {
+      "type": "The Stadium Screen",
+      "style": "Huge typography. Rows animate in. Top 3 are distinct cards."
+    }
+  },
+  "components": {
+    "ScoreInput": {
+      "description": "Custom stepper component. NOT a text input.",
+      "style": "Big '-' button (Zinc), Value Display (Mono, Huge), Big '+' button (Primary).",
+      "interaction": "Vibrate/Haptic feedback on touch if possible (web API)."
+    },
+    "PenaltyToggle": {
+      "description": "Big toggle button that turns Red when active.",
+      "style": "Default: Zinc-900 border. Active: Red-600 bg + Glow."
+    },
+    "CompetitorCard": {
+      "description": "Card showing Car #, Driver Name, Vehicle.",
+      "style": "Left border strip indicates Class color."
+    },
+    "LeaderboardRow": {
+      "description": "Striped rows. Rank 1 is Gold gradient border.",
+      "animation": "Slide in from right."
+    }
+  },
+  "visual_enhancers": {
+    "textures": {
+      "asphalt": "Subtle noise overlay (opacity 0.05) on the main background.",
+      "carbon_fiber": "Diagonal stripe pattern for header backgrounds."
+    },
+    "effects": {
+      "neon_glow": "box-shadow: 0 0 20px theme('colors.primary.DEFAULT') on active inputs.",
+      "speed_lines": "Skewed containers (-3deg) for headings to imply motion."
+    }
+  },
+  "assets": {
+    "images": [
+      {
+        "category": "login_bg",
+        "url": "https://images.unsplash.com/photo-1759951124076-691c4ce81571",
+        "description": "Black car drifting with smoke. Use with heavy dark overlay (bg-black/80)."
+      },
+      {
+        "category": "texture_checkered",
+        "url": "https://images.unsplash.com/photo-1593166978275-5dbc8b293c3c",
+        "description": "Checkered flag pattern. Use as subtle watermark on Leaderboard."
+      }
+    ],
+    "icons": "Lucide React (Zap, Flame, AlertTriangle, Trophy, Timer, Flag)"
+  },
+  "instructions_to_main_agent": {
+    "setup": [
+      "Install fonts: Unbounded, Rajdhani, JetBrains Mono via Google Fonts.",
+      "Configure Tailwind colors to match the 'Nitro' palette.",
+      "Set body background to #09090b."
+    ],
+    "implementation_priority": [
+      "1. Judge Scoring Flow (Critical Path) - Must be touch-friendly.",
+      "2. Admin Dashboard - Data management.",
+      "3. Leaderboard - Visual impact."
+    ],
+    "specific_rules": [
+      "DO NOT use standard HTML selects. Use Shadcn Select with custom dark styling.",
+      "DO NOT use white backgrounds anywhere. Card backgrounds must be Zinc-900 or Black.",
+      "Ensure 'Submit Score' button is the largest element on the Judge page."
+    ]
+  },
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy",
+    "Use glass-morphism effects with backdrop filters (12-24px blur)",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms",
+    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file. This disrupts the human natural reading flow of text",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Main agent relies on these image URLs. Missing categories = main agent will use placeholder text which is FORBIDDEN",
+    "Prioritize using pre-existing components from src/components/ui when applicable",
+    "Components MUST use named exports (export const ComponentName = ...)",
+    "Pages MUST use default exports (export default function PageName() {...})",
+    "Use sonner for toasts"
+  ]
+}
