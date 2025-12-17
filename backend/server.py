@@ -143,6 +143,45 @@ class ScoreCreate(BaseModel):
     penalty_failed_drive_off: int = 0
     penalty_large_fire: int = 0
 
+class ScoreUpdate(BaseModel):
+    instant_smoke: Optional[int] = None
+    constant_smoke: Optional[int] = None
+    volume_of_smoke: Optional[int] = None
+    driving_skill: Optional[int] = None
+    tyres_popped: Optional[int] = None
+    penalty_reversing: Optional[int] = None
+    penalty_stopping: Optional[int] = None
+    penalty_contact_barrier: Optional[int] = None
+    penalty_small_fire: Optional[int] = None
+    penalty_failed_drive_off: Optional[int] = None
+    penalty_large_fire: Optional[int] = None
+
+class ScoreWithDetails(BaseModel):
+    id: str
+    judge_id: str
+    judge_name: str
+    competitor_id: str
+    competitor_name: str
+    car_number: str
+    round_id: str
+    round_name: str
+    instant_smoke: int
+    constant_smoke: int
+    volume_of_smoke: int
+    driving_skill: int
+    tyres_popped: int
+    penalty_reversing: int
+    penalty_stopping: int
+    penalty_contact_barrier: int
+    penalty_small_fire: int
+    penalty_failed_drive_off: int
+    penalty_large_fire: int
+    score_subtotal: int
+    penalty_total: int
+    final_score: int
+    submitted_at: datetime
+    edited_at: Optional[datetime] = None
+
 class LeaderboardEntry(BaseModel):
     competitor_id: str
     competitor_name: str
