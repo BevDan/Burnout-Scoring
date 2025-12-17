@@ -191,7 +191,7 @@ export default function Leaderboard({ user }) {
 
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <span className="data-font text-2xl md:text-3xl font-bold text-[#f97316]">#{entry.car_number}</span>
+                          <span className="car-number-font text-2xl md:text-3xl font-bold text-[#f97316]">#{entry.car_number}</span>
                           <div>
                             <h3 className="ui-font text-xl md:text-2xl font-bold text-white">{entry.competitor_name}</h3>
                             <p className="text-sm text-[#a1a1aa]">{entry.vehicle_info}</p>
