@@ -292,7 +292,7 @@ async def create_competitor(competitor_create: CompetitorCreate, admin: User = D
     return competitor
 
 @api_router.post("/admin/competitors/bulk")
-async def bulk_import_competitors(csv_data: str, admin: User = Depends(require_admin)):
+async def bulk_import_competitors(request: Request, admin: User = Depends(require_admin)):
     try:
         csv_file = io.StringIO(csv_data)
         reader = csv.DictReader(csv_file)
