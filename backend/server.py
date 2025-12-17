@@ -70,6 +70,7 @@ class Competitor(BaseModel):
     name: str
     car_number: str
     vehicle_info: str
+    plate: str
     class_id: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -77,6 +78,7 @@ class CompetitorCreate(BaseModel):
     name: str
     car_number: str
     vehicle_info: str
+    plate: str
     class_id: str
 
 class CompetitorWithClass(BaseModel):
