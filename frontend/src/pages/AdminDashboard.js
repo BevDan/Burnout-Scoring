@@ -122,6 +122,15 @@ export default function AdminDashboard({ user, onLogout }) {
               <Trophy className="w-4 h-4 mr-2" />
               Leaderboard
             </Button>
+            <Button 
+              onClick={() => setProfileOpen(true)} 
+              variant="outline" 
+              className="border-[#27272a]"
+              data-testid="profile-settings-button"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Settings
+            </Button>
             <Button onClick={onLogout} variant="outline" className="border-[#27272a]" data-testid="logout-button">
               <LogOut className="w-4 h-4 mr-2" />
               Logout
