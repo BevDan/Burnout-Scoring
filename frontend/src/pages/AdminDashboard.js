@@ -193,12 +193,15 @@ export default function AdminDashboard({ user, onLogout }) {
         </Tabs>
       </main>
 
-      <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
-        <DialogContent className="bg-[#18181b] border-[#27272a] text-white">
+      <Dialog open={profileOpen} onOpenChange={(open) => { setProfileOpen(open); setResetConfirm(''); }}>
+        <DialogContent className="bg-[#18181b] border-[#27272a] text-white max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="ui-font text-xl">Profile Settings</DialogTitle>
+            <DialogTitle className="ui-font text-xl">Settings</DialogTitle>
           </DialogHeader>
+          
+          {/* Profile Section */}
           <div className="space-y-4">
+            <h3 className="ui-font text-lg font-semibold text-white border-b border-[#27272a] pb-2">Profile</h3>
             <div className="bg-[#09090b] p-3 rounded border border-[#27272a]">
               <p className="text-sm text-[#a1a1aa]">Username</p>
               <p className="text-white data-font">{user.username}</p>
@@ -229,6 +232,91 @@ export default function AdminDashboard({ user, onLogout }) {
             <Button onClick={handleProfileUpdate} className="w-full btn-primary" data-testid="update-profile-button">
               Update Profile
             </Button>
+          </div>
+
+          {/* Data Management Section */}
+          <div className="space-y-4 mt-6">
+            <h3 className="ui-font text-lg font-semibold text-white border-b border-[#27272a] pb-2 flex items-center gap-2">
+              <Trash2 className="w-5 h-5 text-[#ef4444]" />
+              Data Management
+            </h3>
+            
+            <div className="bg-[#1c1917] p-4 rounded border border-[#ef4444]/30">
+              <div className="flex items-start gap-3 mb-4">
+                <AlertTriangle className="w-5 h-5 text-[#f59e0b] flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-[#a1a1aa]">
+                  These actions are <span className="text-[#ef4444] font-bold">irreversible</span>. Type the confirmation text exactly to proceed.
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {/* Reset Scores Only */}
+                <div className="bg-[#09090b] p-3 rounded border border-[#27272a]">
+                  <p className="text-white font-semibold mb-1">Reset Scores Only</p>
+                  <p className="text-xs text-[#a1a1aa] mb-2">Deletes all submitted scores. Keeps competitors, rounds, classes, and judges.</p>
+                  <div className="flex gap-2">
+                    <Input
+                      value={resetConfirm}
+                      onChange={(e) => setResetConfirm(e.target.value)}
+                      placeholder='Type "DELETE SCORES" to confirm'
+                      className="bg-[#18181b] border-[#27272a] text-sm flex-1"
+                    />
+                    <Button 
+                      onClick={() => handleReset('scores')}
+                      disabled={isResetting}
+                      className="bg-[#f59e0b] hover:bg-[#d97706] text-black"
+                      size="sm"
+                    >
+                      Reset
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Reset Competition Data */}
+                <div className="bg-[#09090b] p-3 rounded border border-[#27272a]">
+                  <p className="text-white font-semibold mb-1">Reset Competition Data</p>
+                  <p className="text-xs text-[#a1a1aa] mb-2">Deletes scores, competitors, rounds, and classes. Keeps judges and admin.</p>
+                  <div className="flex gap-2">
+                    <Input
+                      value={resetConfirm}
+                      onChange={(e) => setResetConfirm(e.target.value)}
+                      placeholder='Type "DELETE COMPETITION" to confirm'
+                      className="bg-[#18181b] border-[#27272a] text-sm flex-1"
+                    />
+                    <Button 
+                      onClick={() => handleReset('competition')}
+                      disabled={isResetting}
+                      className="bg-[#ef4444] hover:bg-[#dc2626] text-white"
+                      size="sm"
+                    >
+                      Reset
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Full Reset */}
+                <div className="bg-[#09090b] p-3 rounded border border-[#ef4444]/50">
+                  <p className="text-[#ef4444] font-semibold mb-1">Full Reset</p>
+                  <p className="text-xs text-[#a1a1aa] mb-2">Deletes EVERYTHING except your admin account. Use for starting a completely new competition.</p>
+                  <div className="flex gap-2">
+                    <Input
+                      value={resetConfirm}
+                      onChange={(e) => setResetConfirm(e.target.value)}
+                      placeholder='Type "DELETE ALL" to confirm'
+                      className="bg-[#18181b] border-[#ef4444]/30 text-sm flex-1"
+                    />
+                    <Button 
+                      onClick={() => handleReset('full')}
+                      disabled={isResetting}
+                      className="bg-[#7f1d1d] hover:bg-[#991b1b] text-white"
+                      size="sm"
+                    >
+                      Reset All
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
