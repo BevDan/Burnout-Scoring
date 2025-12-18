@@ -123,10 +123,10 @@ class Score(BaseModel):
     judge_name: str
     competitor_id: str
     round_id: str
-    instant_smoke: int = 0  # 0-10
-    constant_smoke: int = 0  # 0-20
-    volume_of_smoke: int = 0  # 0-20
-    driving_skill: int = 0  # 0-40
+    instant_smoke: float = 0  # 0-10 (0.5 increments)
+    constant_smoke: float = 0  # 0-20 (0.5 increments)
+    volume_of_smoke: float = 0  # 0-20 (0.5 increments)
+    driving_skill: float = 0  # 0-40 (0.5 increments)
     tyres_popped: int = 0  # count (max 2)
     penalty_reversing: int = 0  # count
     penalty_stopping: int = 0  # count
@@ -134,9 +134,9 @@ class Score(BaseModel):
     penalty_small_fire: int = 0  # count
     penalty_failed_drive_off: int = 0  # count
     penalty_large_fire: int = 0  # count
-    score_subtotal: int = 0
+    score_subtotal: float = 0
     penalty_total: int = 0
-    final_score: int = 0
+    final_score: float = 0
     submitted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     edited_at: Optional[datetime] = None
 
