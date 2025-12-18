@@ -681,8 +681,9 @@ function ScoreReviewDialog({ open, onOpenChange, scores, onScoreUpdated }) {
                         type="number"
                         min="0"
                         max="10"
+                        step="0.5"
                         value={editData.instant_smoke}
-                        onChange={(e) => setEditData({...editData, instant_smoke: parseInt(e.target.value) || 0})}
+                        onChange={(e) => setEditData({...editData, instant_smoke: parseFloat(e.target.value) || 0})}
                         className="w-full mt-1 px-3 py-2 bg-[#09090b] border border-[#27272a] rounded text-white"
                       />
                     </div>
@@ -692,8 +693,9 @@ function ScoreReviewDialog({ open, onOpenChange, scores, onScoreUpdated }) {
                         type="number"
                         min="0"
                         max="20"
+                        step="0.5"
                         value={editData.constant_smoke}
-                        onChange={(e) => setEditData({...editData, constant_smoke: parseInt(e.target.value) || 0})}
+                        onChange={(e) => setEditData({...editData, constant_smoke: parseFloat(e.target.value) || 0})}
                         className="w-full mt-1 px-3 py-2 bg-[#09090b] border border-[#27272a] rounded text-white"
                       />
                     </div>
@@ -703,8 +705,9 @@ function ScoreReviewDialog({ open, onOpenChange, scores, onScoreUpdated }) {
                         type="number"
                         min="0"
                         max="20"
+                        step="0.5"
                         value={editData.volume_of_smoke}
-                        onChange={(e) => setEditData({...editData, volume_of_smoke: parseInt(e.target.value) || 0})}
+                        onChange={(e) => setEditData({...editData, volume_of_smoke: parseFloat(e.target.value) || 0})}
                         className="w-full mt-1 px-3 py-2 bg-[#09090b] border border-[#27272a] rounded text-white"
                       />
                     </div>
@@ -714,8 +717,9 @@ function ScoreReviewDialog({ open, onOpenChange, scores, onScoreUpdated }) {
                         type="number"
                         min="0"
                         max="40"
+                        step="0.5"
                         value={editData.driving_skill}
-                        onChange={(e) => setEditData({...editData, driving_skill: parseInt(e.target.value) || 0})}
+                        onChange={(e) => setEditData({...editData, driving_skill: parseFloat(e.target.value) || 0})}
                         className="w-full mt-1 px-3 py-2 bg-[#09090b] border border-[#27272a] rounded text-white"
                       />
                     </div>
