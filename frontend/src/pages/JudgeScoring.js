@@ -546,6 +546,41 @@ function PenaltyCounter({ label, points, value, onChange, testId }) {
   );
 }
 
+function PenaltyToggle({ label, points, value, onChange, testId }) {
+  const isActive = value > 0;
+  
+  return (
+    <div 
+      className={`p-4 rounded border-2 transition-all cursor-pointer ${
+        isActive
+          ? 'bg-[#ef4444]/20 border-[#ef4444] neon-glow'
+          : 'bg-[#18181b] border-[#27272a] hover:border-[#3f3f46]'
+      }`}
+      onClick={() => onChange(isActive ? 0 : 1)}
+      data-testid={testId}
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <span className="ui-font text-lg font-semibold text-white">{label}</span>
+          <p className="text-xs text-[#a1a1aa]">-{points} pts (one-time)</p>
+        </div>
+        <div className="flex items-center gap-3">
+          {isActive && (
+            <span className="data-font text-xl font-bold text-[#ef4444]">-{points}</span>
+          )}
+          <div className={`w-12 h-7 rounded-full transition-colors relative ${
+            isActive ? 'bg-[#ef4444]' : 'bg-[#27272a]'
+          }`}>
+            <div className={`absolute top-1 w-5 h-5 rounded-full bg-white transition-all ${
+              isActive ? 'left-6' : 'left-1'
+            }`} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ScoreReviewDialog({ open, onOpenChange, scores, onScoreUpdated }) {
   const [editingScore, setEditingScore] = useState(null);
   const [editData, setEditData] = useState(null);
