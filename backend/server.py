@@ -188,9 +188,9 @@ class ScoreWithDetails(BaseModel):
     penalty_small_fire: int
     penalty_failed_drive_off: int
     penalty_large_fire: int
-    score_subtotal: int
+    score_subtotal: float
     penalty_total: int
-    final_score: int
+    final_score: float
     submitted_at: datetime
     edited_at: Optional[datetime] = None
 
