@@ -177,10 +177,10 @@ class ScoreWithDetails(BaseModel):
     car_number: str
     round_id: str
     round_name: str
-    instant_smoke: int
-    constant_smoke: int
-    volume_of_smoke: int
-    driving_skill: int
+    instant_smoke: float
+    constant_smoke: float
+    volume_of_smoke: float
+    driving_skill: float
     tyres_popped: int
     penalty_reversing: int
     penalty_stopping: int
