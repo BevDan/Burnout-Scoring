@@ -459,9 +459,10 @@ export default function JudgeScoring({ user, onLogout }) {
   );
 }
 
-function ScoreInput({ label, value, max, onChange, points, testId }) {
+function ScoreInput({ label, value, max, onChange, points, testId, integerOnly = false }) {
   // Format display value - show .5 only when needed
   const displayValue = Number.isInteger(value) ? value : value.toFixed(1);
+  const step = integerOnly ? 1 : 0.5;
   
   return (
     <div className="score-stepper">
@@ -472,34 +473,38 @@ function ScoreInput({ label, value, max, onChange, points, testId }) {
       <div className="flex items-center gap-2 mb-3">
         <button
           onClick={() => onChange(Math.max(0, value - 1))}
-          className="w-14 h-14 bg-[#27272a] hover:bg-[#3f3f46] rounded text-white text-xl font-bold transition-colors"
+          className={`${integerOnly ? 'w-16' : 'w-14'} h-14 bg-[#27272a] hover:bg-[#3f3f46] rounded text-white text-xl font-bold transition-colors`}
           data-testid={`${testId}-minus`}
         >
           <Minus className="w-5 h-5 mx-auto" />
         </button>
-        <button
-          onClick={() => onChange(Math.max(0, value - 0.5))}
-          className="w-12 h-14 bg-[#27272a] hover:bg-[#3f3f46] rounded text-white text-sm font-bold transition-colors"
-          data-testid={`${testId}-minus-half`}
-        >
-          -0.5
-        </button>
+        {!integerOnly && (
+          <button
+            onClick={() => onChange(Math.max(0, value - 0.5))}
+            className="w-12 h-14 bg-[#27272a] hover:bg-[#3f3f46] rounded text-white text-sm font-bold transition-colors"
+            data-testid={`${testId}-minus-half`}
+          >
+            -0.5
+          </button>
+        )}
         <div className="flex-1 text-center">
           <div className="data-font text-5xl font-bold text-[#f97316]" data-testid={`${testId}-value`}>{displayValue}</div>
           {points !== undefined && (
             <div className="text-sm text-[#22c55e] mt-1">= {points} points</div>
           )}
         </div>
-        <button
-          onClick={() => onChange(Math.min(max, value + 0.5))}
-          className="w-12 h-14 bg-[#f97316] hover:bg-[#ea580c] rounded text-white text-sm font-bold transition-colors"
-          data-testid={`${testId}-plus-half`}
-        >
-          +0.5
-        </button>
+        {!integerOnly && (
+          <button
+            onClick={() => onChange(Math.min(max, value + 0.5))}
+            className="w-12 h-14 bg-[#f97316] hover:bg-[#ea580c] rounded text-white text-sm font-bold transition-colors"
+            data-testid={`${testId}-plus-half`}
+          >
+            +0.5
+          </button>
+        )}
         <button
           onClick={() => onChange(Math.min(max, value + 1))}
-          className="w-14 h-14 btn-primary rounded text-white text-xl font-bold"
+          className={`${integerOnly ? 'w-16' : 'w-14'} h-14 btn-primary rounded text-white text-xl font-bold`}
           data-testid={`${testId}-plus`}
         >
           <Plus className="w-5 h-5 mx-auto" />
@@ -509,9 +514,9 @@ function ScoreInput({ label, value, max, onChange, points, testId }) {
         type="range"
         min="0"
         max={max}
-        step="0.5"
+        step={step}
         value={value}
-        onChange={(e) => onChange(parseFloat(e.target.value))}
+        onChange={(e) => onChange(integerOnly ? parseInt(e.target.value) : parseFloat(e.target.value))}
         className="w-full h-2 bg-[#27272a] rounded-lg appearance-none cursor-pointer slider"
         data-testid={`${testId}-slider`}
         style={{
