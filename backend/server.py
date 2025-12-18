@@ -143,10 +143,10 @@ class Score(BaseModel):
 class ScoreCreate(BaseModel):
     competitor_id: str
     round_id: str
-    instant_smoke: int = 0
-    constant_smoke: int = 0
-    volume_of_smoke: int = 0
-    driving_skill: int = 0
+    instant_smoke: float = 0
+    constant_smoke: float = 0
+    volume_of_smoke: float = 0
+    driving_skill: float = 0
     tyres_popped: int = 0
     penalty_reversing: int = 0
     penalty_stopping: int = 0
