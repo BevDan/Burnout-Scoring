@@ -328,6 +328,7 @@ export default function JudgeScoring({ user, onLogout }) {
             onChange={(v) => updateScore('tyres_popped', v, 2)}
             points={scoreData.tyres_popped * 5}
             testId="tyres-popped"
+            integerOnly={true}
           />
         </div>
 
