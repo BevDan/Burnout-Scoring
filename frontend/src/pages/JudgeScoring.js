@@ -757,24 +757,26 @@ function ScoreReviewDialog({ open, onOpenChange, scores, onScoreUpdated }) {
                         />
                       </div>
                       <div>
-                        <span className="text-xs text-[#a1a1aa]">Failed Drive Off</span>
-                        <input
-                          type="number"
-                          min="0"
-                          value={editData.penalty_failed_drive_off}
-                          onChange={(e) => setEditData({...editData, penalty_failed_drive_off: parseInt(e.target.value) || 0})}
-                          className="w-full mt-1 px-2 py-1 bg-[#09090b] border border-[#27272a] rounded text-white text-sm"
-                        />
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={editData.penalty_failed_drive_off > 0}
+                            onChange={(e) => setEditData({...editData, penalty_failed_drive_off: e.target.checked ? 1 : 0})}
+                            className="w-4 h-4 rounded border-[#27272a] bg-[#09090b]"
+                          />
+                          <span className="text-xs text-[#a1a1aa]">Failed Drive Off (-10)</span>
+                        </label>
                       </div>
                       <div>
-                        <span className="text-xs text-[#a1a1aa]">Large Fire</span>
-                        <input
-                          type="number"
-                          min="0"
-                          value={editData.penalty_large_fire}
-                          onChange={(e) => setEditData({...editData, penalty_large_fire: parseInt(e.target.value) || 0})}
-                          className="w-full mt-1 px-2 py-1 bg-[#09090b] border border-[#27272a] rounded text-white text-sm"
-                        />
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={editData.penalty_large_fire > 0}
+                            onChange={(e) => setEditData({...editData, penalty_large_fire: e.target.checked ? 1 : 0})}
+                            className="w-4 h-4 rounded border-[#27272a] bg-[#09090b]"
+                          />
+                          <span className="text-xs text-[#a1a1aa]">Large Fire (-10)</span>
+                        </label>
                       </div>
                     </div>
                   </div>
