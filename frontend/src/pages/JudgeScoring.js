@@ -366,14 +366,14 @@ export default function JudgeScoring({ user, onLogout }) {
               onChange={(v) => updatePenalty('penalty_small_fire', v)}
               testId="penalty-small-fire"
             />
-            <PenaltyCounter
+            <PenaltyToggle
               label="Failed to Drive Off Pad"
               points={10}
               value={scoreData.penalty_failed_drive_off}
               onChange={(v) => updatePenalty('penalty_failed_drive_off', v)}
               testId="penalty-failed-drive-off"
             />
-            <PenaltyCounter
+            <PenaltyToggle
               label="Large Fire"
               points={10}
               value={scoreData.penalty_large_fire}
