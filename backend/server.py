@@ -156,10 +156,10 @@ class ScoreCreate(BaseModel):
     penalty_large_fire: int = 0
 
 class ScoreUpdate(BaseModel):
-    instant_smoke: Optional[int] = None
-    constant_smoke: Optional[int] = None
-    volume_of_smoke: Optional[int] = None
-    driving_skill: Optional[int] = None
+    instant_smoke: Optional[float] = None
+    constant_smoke: Optional[float] = None
+    volume_of_smoke: Optional[float] = None
+    driving_skill: Optional[float] = None
     tyres_popped: Optional[int] = None
     penalty_reversing: Optional[int] = None
     penalty_stopping: Optional[int] = None
