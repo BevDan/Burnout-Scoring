@@ -81,10 +81,20 @@ export default function JudgeScoring({ user, onLogout }) {
     }
   };
 
+  const fetchClasses = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/classes`, getAuthHeaders());
+      setClasses(response.data);
+    } catch (error) {
+      toast.error('Failed to load classes');
+    }
+  };
+
   const fetchCompetitors = async () => {
     try {
       const response = await axios.get(`${API}/judge/competitors/${selectedRound}`, getAuthHeaders());
       setCompetitors(response.data);
+      setSelectedClass('all'); // Reset class filter when round changes
     } catch (error) {
       toast.error('Failed to load competitors');
     }
