@@ -28,6 +28,7 @@ export default function JudgeScoring({ user, onLogout }) {
   const [profileData, setProfileData] = useState({ name: '', password: '' });
 
   const [scoreData, setScoreData] = useState({
+    tip_in: 0,
     instant_smoke: 0,
     constant_smoke: 0,
     volume_of_smoke: 0,
