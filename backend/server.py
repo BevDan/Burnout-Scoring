@@ -683,10 +683,10 @@ async def export_all_data(admin: User = Depends(require_admin)):
     output = io.StringIO()
     writer = csv.writer(output)
     
-    # Write comprehensive header
+    # Write comprehensive header (includes Tip In)
     writer.writerow([
         "Score ID", "Judge Name", "Round Name", "Round Date", "Competitor Name", 
-        "Car Number", "Plate", "Vehicle", "Class", "Instant Smoke", "Constant Smoke", 
+        "Car Number", "Plate", "Vehicle", "Class", "Tip In", "Instant Smoke", "Constant Smoke", 
         "Volume Smoke", "Driving Skill", "Tyres Popped", "Tyres Points",
         "Reversing Count", "Stopping Count", "Barrier Contact Count", "Small Fire Count",
         "Failed Drive Off Count", "Large Fire Count",
@@ -711,22 +711,23 @@ async def export_all_data(admin: User = Depends(require_admin)):
             comp.get("plate", ""),
             comp.get("vehicle_info", ""),
             class_name,
-            score["instant_smoke"],
-            score["constant_smoke"],
-            score["volume_of_smoke"],
-            score["driving_skill"],
-            score["tyres_popped"],
-            score["tyres_popped"] * 5,
+            score.get("tip_in", 0),  # Handle old scores without tip_in
+            score.get("instant_smoke", 0),
+            score.get("constant_smoke", 0),
+            score.get("volume_of_smoke", 0),
+            score.get("driving_skill", 0),
+            score.get("tyres_popped", 0),
+            score.get("tyres_popped", 0) * 5,
             score.get("penalty_reversing", 0),
             score.get("penalty_stopping", 0),
             score.get("penalty_contact_barrier", 0),
             score.get("penalty_small_fire", 0),
             score.get("penalty_failed_drive_off", 0),
             score.get("penalty_large_fire", 0),
-            score["score_subtotal"],
-            score["penalty_total"],
-            score["final_score"],
-            score["submitted_at"],
+            score.get("score_subtotal", 0),
+            score.get("penalty_total", 0),
+            score.get("final_score", 0),
+            score.get("submitted_at", ""),
             score.get("edited_at", ""),
             was_edited
         ])
