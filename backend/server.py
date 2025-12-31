@@ -123,6 +123,7 @@ class Score(BaseModel):
     judge_name: str
     competitor_id: str
     round_id: str
+    tip_in: float = 0  # 0-10 (0.5 increments) - NEW
     instant_smoke: float = 0  # 0-10 (0.5 increments)
     constant_smoke: float = 0  # 0-20 (0.5 increments)
     volume_of_smoke: float = 0  # 0-20 (0.5 increments)
@@ -143,6 +144,7 @@ class Score(BaseModel):
 class ScoreCreate(BaseModel):
     competitor_id: str
     round_id: str
+    tip_in: float = 0
     instant_smoke: float = 0
     constant_smoke: float = 0
     volume_of_smoke: float = 0
@@ -156,6 +158,7 @@ class ScoreCreate(BaseModel):
     penalty_large_fire: int = 0
 
 class ScoreUpdate(BaseModel):
+    tip_in: Optional[float] = None
     instant_smoke: Optional[float] = None
     constant_smoke: Optional[float] = None
     volume_of_smoke: Optional[float] = None
