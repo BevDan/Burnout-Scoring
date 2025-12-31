@@ -519,6 +519,8 @@ function ClassesPanel({ classes, onRefresh }) {
 function CompetitorsPanel({ competitors, classes, onRefresh }) {
   const [open, setOpen] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editingCompetitor, setEditingCompetitor] = useState(null);
   const [csvData, setCsvData] = useState('');
   const [formData, setFormData] = useState({ name: '', car_number: '', vehicle_info: '', plate: '', class_id: '' });
 
@@ -548,6 +550,31 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
       onRefresh();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Import failed');
+    }
+  };
+
+  const startEdit = (competitor) => {
+    setEditingCompetitor(competitor);
+    setFormData({
+      name: competitor.name,
+      car_number: competitor.car_number,
+      vehicle_info: competitor.vehicle_info || '',
+      plate: competitor.plate || '',
+      class_id: competitor.class_id
+    });
+    setEditOpen(true);
+  };
+
+  const handleEdit = async () => {
+    try {
+      await axios.put(`${API}/admin/competitors/${editingCompetitor.id}`, formData, getAuthHeaders());
+      toast.success('Competitor updated successfully');
+      setEditOpen(false);
+      setEditingCompetitor(null);
+      setFormData({ name: '', car_number: '', vehicle_info: '', plate: '', class_id: '' });
+      onRefresh();
+    } catch (error) {
+      toast.error('Failed to update competitor');
     }
   };
 
