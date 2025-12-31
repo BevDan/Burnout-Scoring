@@ -263,23 +263,44 @@ export default function JudgeScoring({ user, onLogout }) {
 
           <div>
             <label className="ui-font text-sm font-semibold tracking-wide text-[#a1a1aa] uppercase block mb-2">
+              Filter by Class
+            </label>
+            <Select 
+              value={selectedClass} 
+              onValueChange={setSelectedClass}
+              disabled={!selectedRound}
+            >
+              <SelectTrigger className="bg-[#18181b] border-[#27272a] text-white h-14" data-testid="class-filter-select">
+                <SelectValue placeholder="Select class" />
+              </SelectTrigger>
+              <SelectContent className="bg-[#18181b] border-[#27272a]">
+                <SelectItem value="all">All Classes</SelectItem>
+                {classes.map((cls) => (
+                  <SelectItem key={cls.id} value={cls.id}>{cls.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="ui-font text-sm font-semibold tracking-wide text-[#a1a1aa] uppercase block mb-2">
               Select Competitor
             </label>
             <Select 
               value={selectedCompetitor?.id || ''} 
-              onValueChange={(id) => setSelectedCompetitor(competitors.find(c => c.id === id))}
+              onValueChange={(id) => setSelectedCompetitor(filteredCompetitors.find(c => c.id === id))}
               disabled={!selectedRound}
             >
               <SelectTrigger className="bg-[#18181b] border-[#27272a] text-white h-14" data-testid="competitor-select">
-                <SelectValue placeholder={!selectedRound ? "Select a round first" : competitors.length === 0 ? "No competitors available" : "Choose a competitor"} />
+                <SelectValue placeholder={!selectedRound ? "Select a round first" : filteredCompetitors.length === 0 ? "No competitors in this class" : "Choose a competitor"} />
               </SelectTrigger>
               <SelectContent className="bg-[#18181b] border-[#27272a]">
-                {competitors.length === 0 ? (
+                {filteredCompetitors.length === 0 ? (
                   <div className="p-4 text-center text-[#a1a1aa]">
-                    No competitors found. Contact admin to add competitors.
+                    {competitors.length === 0 ? "No competitors found. Contact admin to add competitors." : "No competitors in selected class."}
                   </div>
                 ) : (
-                  competitors.map((comp) => (
+                  filteredCompetitors.map((comp) => (
                     <SelectItem key={comp.id} value={comp.id}>
                       <span className="car-number-font">#{comp.car_number}</span> - {comp.name} ({comp.class_name})
                     </SelectItem>
