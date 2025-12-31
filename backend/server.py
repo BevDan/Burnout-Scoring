@@ -484,6 +484,7 @@ async def get_competitors_for_round(round_id: str, current_user: User = Depends(
 async def submit_score(request: Request, score_create: ScoreCreate, current_user: User = Depends(get_current_user)):
     # Calculate scores
     score_subtotal = (
+        score_create.tip_in +
         score_create.instant_smoke +
         score_create.constant_smoke +
         score_create.volume_of_smoke +
