@@ -694,6 +694,18 @@ function ScoreReviewDialog({ open, onOpenChange, scores, onScoreUpdated }) {
                 <div className="space-y-4 bg-[#18181b] p-4 rounded">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
+                      <label className="text-sm text-[#a1a1aa]">Tip In (0-10)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="10"
+                        step="0.5"
+                        value={editData.tip_in}
+                        onChange={(e) => setEditData({...editData, tip_in: parseFloat(e.target.value) || 0})}
+                        className="w-full mt-1 px-3 py-2 bg-[#09090b] border border-[#27272a] rounded text-white"
+                      />
+                    </div>
+                    <div>
                       <label className="text-sm text-[#a1a1aa]">Instant Smoke (0-10)</label>
                       <input
                         type="number"
