@@ -96,6 +96,7 @@ export default function JudgeScoring({ user, onLogout }) {
 
   const calculateTotals = () => {
     const subtotal = 
+      scoreData.tip_in +
       scoreData.instant_smoke +
       scoreData.constant_smoke +
       scoreData.volume_of_smoke +
