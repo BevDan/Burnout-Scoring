@@ -752,7 +752,7 @@ async def export_scores(round_id: str, admin: User = Depends(require_admin)):
     writer = csv.writer(output)
     writer.writerow([
         "Competitor Name", "Car Number", "Vehicle", "Class", "Judge",
-        "Instant Smoke", "Constant Smoke", "Volume Smoke", "Driving Skill",
+        "Tip In", "Instant Smoke", "Constant Smoke", "Volume Smoke", "Driving Skill",
         "Tyres Popped", "Score Subtotal", "Penalty Total", "Final Score", "Submitted At"
     ])
     
@@ -764,16 +764,17 @@ async def export_scores(round_id: str, admin: User = Depends(require_admin)):
             comp.get("car_number", ""),
             comp.get("vehicle_info", ""),
             class_name,
-            score["judge_name"],
-            score["instant_smoke"],
-            score["constant_smoke"],
-            score["volume_of_smoke"],
-            score["driving_skill"],
-            score["tyres_popped"],
-            score["score_subtotal"],
-            score["penalty_total"],
-            score["final_score"],
-            score["submitted_at"]
+            score.get("judge_name", ""),
+            score.get("tip_in", 0),  # Handle old scores without tip_in
+            score.get("instant_smoke", 0),
+            score.get("constant_smoke", 0),
+            score.get("volume_of_smoke", 0),
+            score.get("driving_skill", 0),
+            score.get("tyres_popped", 0),
+            score.get("score_subtotal", 0),
+            score.get("penalty_total", 0),
+            score.get("final_score", 0),
+            score.get("submitted_at", "")
         ])
     
     output.seek(0)
