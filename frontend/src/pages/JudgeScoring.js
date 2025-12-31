@@ -293,6 +293,14 @@ export default function JudgeScoring({ user, onLogout }) {
           <h2 className="ui-font text-2xl font-bold tracking-wide text-white">SCORING</h2>
 
           <ScoreInput
+            label="Tip In"
+            value={scoreData.tip_in}
+            max={10}
+            onChange={(v) => updateScore('tip_in', v, 10)}
+            testId="tip-in"
+          />
+
+          <ScoreInput
             label="Instant Smoke"
             value={scoreData.instant_smoke}
             max={10}
