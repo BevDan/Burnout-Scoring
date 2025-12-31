@@ -623,6 +623,7 @@ function ScoreReviewDialog({ open, onOpenChange, scores, onScoreUpdated }) {
   const startEdit = (score) => {
     setEditingScore(score.id);
     setEditData({
+      tip_in: score.tip_in || 0,
       instant_smoke: score.instant_smoke,
       constant_smoke: score.constant_smoke,
       volume_of_smoke: score.volume_of_smoke,
