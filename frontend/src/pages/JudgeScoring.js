@@ -20,7 +20,10 @@ export default function JudgeScoring({ user, onLogout }) {
   const navigate = useNavigate();
   const [rounds, setRounds] = useState([]);
   const [selectedRound, setSelectedRound] = useState(null);
+  const [classes, setClasses] = useState([]);
+  const [selectedClass, setSelectedClass] = useState('all');
   const [competitors, setCompetitors] = useState([]);
+  const [filteredCompetitors, setFilteredCompetitors] = useState([]);
   const [selectedCompetitor, setSelectedCompetitor] = useState(null);
   const [myScores, setMyScores] = useState([]);
   const [showReview, setShowReview] = useState(false);
@@ -44,6 +47,7 @@ export default function JudgeScoring({ user, onLogout }) {
 
   useEffect(() => {
     fetchRounds();
+    fetchClasses();
     fetchMyScores();
   }, []);
 
@@ -52,6 +56,17 @@ export default function JudgeScoring({ user, onLogout }) {
       fetchCompetitors();
     }
   }, [selectedRound]);
+
+  useEffect(() => {
+    // Filter competitors based on selected class
+    if (selectedClass === 'all') {
+      setFilteredCompetitors(competitors);
+    } else {
+      setFilteredCompetitors(competitors.filter(c => c.class_id === selectedClass));
+    }
+    // Reset selected competitor when class changes
+    setSelectedCompetitor(null);
+  }, [selectedClass, competitors]);
 
   const fetchRounds = async () => {
     try {
