@@ -706,17 +706,86 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
                 </div>
               </div>
             </div>
-            <Button
-              onClick={() => handleDelete(comp.id)}
-              variant="destructive"
-              size="sm"
-              data-testid={`delete-competitor-${comp.id}`}
-            >
-              Delete
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => startEdit(comp)}
+                className="bg-[#f59e0b] hover:bg-[#d97706]"
+                size="sm"
+                data-testid={`edit-competitor-${comp.id}`}
+              >
+                Edit
+              </Button>
+              <Button
+                onClick={() => handleDelete(comp.id)}
+                variant="destructive"
+                size="sm"
+                data-testid={`delete-competitor-${comp.id}`}
+              >
+                Delete
+              </Button>
+            </div>
           </div>
         ))}
       </div>
+
+      {/* Edit Competitor Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="bg-[#18181b] border-[#27272a] text-white">
+          <DialogHeader>
+            <DialogTitle className="ui-font text-xl">Edit Competitor</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Name</Label>
+              <Input
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="bg-[#09090b] border-[#27272a]"
+              />
+            </div>
+            <div>
+              <Label>Car Number</Label>
+              <Input
+                value={formData.car_number}
+                onChange={(e) => setFormData({ ...formData, car_number: e.target.value })}
+                className="bg-[#09090b] border-[#27272a]"
+              />
+            </div>
+            <div>
+              <Label>Vehicle Info</Label>
+              <Input
+                value={formData.vehicle_info}
+                onChange={(e) => setFormData({ ...formData, vehicle_info: e.target.value })}
+                className="bg-[#09090b] border-[#27272a]"
+              />
+            </div>
+            <div>
+              <Label>Plate</Label>
+              <Input
+                value={formData.plate}
+                onChange={(e) => setFormData({ ...formData, plate: e.target.value })}
+                className="bg-[#09090b] border-[#27272a]"
+              />
+            </div>
+            <div>
+              <Label>Class</Label>
+              <Select value={formData.class_id} onValueChange={(value) => setFormData({ ...formData, class_id: value })}>
+                <SelectTrigger className="bg-[#09090b] border-[#27272a]">
+                  <SelectValue placeholder="Select class" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#18181b] border-[#27272a]">
+                  {classes.map((cls) => (
+                    <SelectItem key={cls.id} value={cls.id}>{cls.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button onClick={handleEdit} className="w-full btn-primary">
+              Update Competitor
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
