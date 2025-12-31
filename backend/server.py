@@ -415,6 +415,20 @@ async def update_competitor(competitor_id: str, competitor_update: CompetitorCre
         updated['created_at'] = datetime.fromisoformat(updated['created_at'])
     return Competitor(**updated)
 
+@api_router.put("/admin/competitors/{competitor_id}", response_model=Competitor)
+async def update_competitor(competitor_id: str, competitor_update: CompetitorCreate, admin: User = Depends(require_admin)):
+    result = await db.competitors.update_one(
+        {"id": competitor_id},
+        {"$set": competitor_update.model_dump()}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Competitor not found")
+    
+    updated = await db.competitors.find_one({"id": competitor_id}, {"_id": 0})
+    if isinstance(updated.get('created_at'), str):
+        updated['created_at'] = datetime.fromisoformat(updated['created_at'])
+    return Competitor(**updated)
+
 @api_router.delete("/admin/competitors/{competitor_id}")
 async def delete_competitor(competitor_id: str, admin: User = Depends(require_admin)):
     result = await db.competitors.delete_one({"id": competitor_id})
