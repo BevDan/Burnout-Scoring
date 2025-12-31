@@ -567,6 +567,7 @@ async def update_score(score_id: str, score_update: ScoreUpdate, current_user: U
         updated_score = {**existing_score, **update_data}
         
         score_subtotal = (
+            updated_score.get("tip_in", 0) +
             updated_score["instant_smoke"] +
             updated_score["constant_smoke"] +
             updated_score["volume_of_smoke"] +
