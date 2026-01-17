@@ -298,30 +298,52 @@ export default function JudgeScoring({ user, onLogout }) {
 
           <div>
             <label className="ui-font text-sm font-semibold tracking-wide text-[#a1a1aa] uppercase block mb-2">
-              Select Competitor
+              Enter Car # or Select Competitor
             </label>
-            <Select 
-              value={selectedCompetitor?.id || ''} 
-              onValueChange={(id) => setSelectedCompetitor(filteredCompetitors.find(c => c.id === id))}
-              disabled={!selectedRound}
-            >
-              <SelectTrigger className="bg-[#18181b] border-[#27272a] text-white h-14" data-testid="competitor-select">
-                <SelectValue placeholder={!selectedRound ? "Select a round first" : filteredCompetitors.length === 0 ? "No competitors in this class" : "Choose a competitor"} />
-              </SelectTrigger>
-              <SelectContent className="bg-[#18181b] border-[#27272a]">
-                {filteredCompetitors.length === 0 ? (
-                  <div className="p-4 text-center text-[#a1a1aa]">
-                    {competitors.length === 0 ? "No competitors found. Contact admin to add competitors." : "No competitors in selected class."}
+            <div className="flex gap-2">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={carNumberSearch}
+                  onChange={(e) => handleCarNumberSearch(e.target.value)}
+                  placeholder="Type #"
+                  disabled={!selectedRound}
+                  className="w-24 h-14 px-3 bg-[#18181b] border border-[#27272a] rounded text-white text-center car-number-font text-xl placeholder:text-[#52525b] disabled:opacity-50"
+                  data-testid="car-number-input"
+                />
+                {carNumberSearch && selectedCompetitor && selectedCompetitor.car_number === carNumberSearch.replace('#', '') && (
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#22c55e] rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs">✓</span>
                   </div>
-                ) : (
-                  filteredCompetitors.map((comp) => (
-                    <SelectItem key={comp.id} value={comp.id}>
-                      <span className="car-number-font">#{comp.car_number}</span> - {comp.name} ({comp.class_name})
-                    </SelectItem>
-                  ))
                 )}
-              </SelectContent>
-            </Select>
+              </div>
+              <Select 
+                value={selectedCompetitor?.id || ''} 
+                onValueChange={(id) => {
+                  const comp = filteredCompetitors.find(c => c.id === id);
+                  setSelectedCompetitor(comp);
+                  setCarNumberSearch(comp?.car_number || '');
+                }}
+                disabled={!selectedRound}
+              >
+                <SelectTrigger className="bg-[#18181b] border-[#27272a] text-white h-14 flex-1" data-testid="competitor-select">
+                  <SelectValue placeholder={!selectedRound ? "Select a round first" : filteredCompetitors.length === 0 ? "No competitors in this class" : "Choose a competitor"} />
+                </SelectTrigger>
+                <SelectContent className="bg-[#18181b] border-[#27272a]">
+                  {filteredCompetitors.length === 0 ? (
+                    <div className="p-4 text-center text-[#a1a1aa]">
+                      {competitors.length === 0 ? "No competitors found. Contact admin to add competitors." : "No competitors in selected class."}
+                    </div>
+                  ) : (
+                    filteredCompetitors.map((comp) => (
+                      <SelectItem key={comp.id} value={comp.id}>
+                        <span className="car-number-font">#{comp.car_number}</span> - {comp.name} ({comp.class_name})
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
