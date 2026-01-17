@@ -25,6 +25,7 @@ export default function JudgeScoring({ user, onLogout }) {
   const [competitors, setCompetitors] = useState([]);
   const [filteredCompetitors, setFilteredCompetitors] = useState([]);
   const [selectedCompetitor, setSelectedCompetitor] = useState(null);
+  const [carNumberSearch, setCarNumberSearch] = useState('');
   const [myScores, setMyScores] = useState([]);
   const [showReview, setShowReview] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
