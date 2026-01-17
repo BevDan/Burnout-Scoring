@@ -607,12 +607,13 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label>CSV Format: name,car_number,vehicle_info,plate,class_id</Label>
+                  <Label>CSV Format: name,car_number,vehicle_info,plate,class_name</Label>
+                  <p className="text-xs text-[#a1a1aa] mb-2">Use the class NAME (not ID) - e.g., "Pro Class", "Street Class"</p>
                   <textarea
                     value={csvData}
                     onChange={(e) => setCsvData(e.target.value)}
                     className="w-full h-48 p-3 bg-[#09090b] border border-[#27272a] rounded text-white data-font text-sm"
-                    placeholder="name,car_number,vehicle_info,plate,class_id&#10;John Doe,42,Ford Mustang,BURNOUT1,class-id-here&#10;Jane Smith,88,Chevy Camaro,SMOKEY,class-id-here"
+                    placeholder="name,car_number,vehicle_info,plate,class_name&#10;John Doe,42,Ford Mustang,BURNOUT1,Pro Class&#10;Jane Smith,88,Chevy Camaro,SMOKEY,Street Class"
                     data-testid="csv-textarea"
                   />
                 </div>
