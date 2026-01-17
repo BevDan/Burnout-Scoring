@@ -383,21 +383,48 @@ async def bulk_import_competitors(request: Request, admin: User = Depends(requir
         csv_file = io.StringIO(csv_data)
         reader = csv.DictReader(csv_file)
         imported = 0
+        errors = []
         
-        for row in reader:
+        # Get all classes for name-to-id lookup
+        classes = await db.classes.find({}, {"_id": 0}).to_list(1000)
+        class_name_to_id = {c["name"].lower(): c["id"] for c in classes}
+        class_id_set = {c["id"] for c in classes}
+        
+        for row_num, row in enumerate(reader, start=2):  # Start at 2 (header is row 1)
+            class_value = row.get('class_id', '').strip() or row.get('class', '').strip() or row.get('class_name', '').strip()
+            
+            # Try to resolve class - accept either ID or name
+            resolved_class_id = None
+            if class_value:
+                if class_value in class_id_set:
+                    # It's already a valid class ID
+                    resolved_class_id = class_value
+                elif class_value.lower() in class_name_to_id:
+                    # It's a class name - look up the ID
+                    resolved_class_id = class_name_to_id[class_value.lower()]
+                else:
+                    errors.append(f"Row {row_num}: Unknown class '{class_value}'")
+                    continue
+            
             competitor = Competitor(
                 name=row.get('name', ''),
                 car_number=row.get('car_number', ''),
                 vehicle_info=row.get('vehicle_info', ''),
                 plate=row.get('plate', ''),
-                class_id=row.get('class_id', '')
+                class_id=resolved_class_id or ''
             )
             doc = competitor.model_dump()
             doc['created_at'] = doc['created_at'].isoformat()
             await db.competitors.insert_one(doc)
             imported += 1
         
-        return {"message": f"Imported {imported} competitors"}
+        message = f"Imported {imported} competitors"
+        if errors:
+            message += f". Errors: {'; '.join(errors[:5])}"
+            if len(errors) > 5:
+                message += f" (+{len(errors) - 5} more)"
+        
+        return {"message": message}
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Import failed: {str(e)}")
 
