@@ -110,6 +110,19 @@ export default function JudgeScoring({ user, onLogout }) {
     }
   };
 
+  const handleCarNumberSearch = (value) => {
+    setCarNumberSearch(value);
+    if (value.trim()) {
+      // Find competitor by car number (exact or partial match)
+      const found = filteredCompetitors.find(c => 
+        c.car_number === value.trim() || c.car_number === value.trim().replace('#', '')
+      );
+      if (found) {
+        setSelectedCompetitor(found);
+      }
+    }
+  };
+
   const updateScore = (field, value, max) => {
     const newValue = Math.max(0, Math.min(max, value));
     setScoreData({ ...scoreData, [field]: newValue });
