@@ -185,6 +185,7 @@ export default function JudgeScoring({ user, onLogout }) {
         penalty_large_fire: 0
       });
       setSelectedCompetitor(null);
+      setCarNumberSearch('');
       fetchMyScores();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to submit score');
