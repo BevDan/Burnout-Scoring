@@ -65,8 +65,9 @@ export default function JudgeScoring({ user, onLogout }) {
     } else {
       setFilteredCompetitors(competitors.filter(c => c.class_id === selectedClass));
     }
-    // Reset selected competitor when class changes
+    // Reset selected competitor and search when class changes
     setSelectedCompetitor(null);
+    setCarNumberSearch('');
   }, [selectedClass, competitors]);
 
   const fetchRounds = async () => {
