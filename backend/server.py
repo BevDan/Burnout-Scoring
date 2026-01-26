@@ -1498,8 +1498,7 @@ class EmailRequest(BaseModel):
     recipient_email: str
 
 class BulkEmailRequest(BaseModel):
-    competitor_emails: List[dict]  # List of {competitor_id, recipient_email}
-    round_id: Optional[str] = None
+    competitor_emails: List[dict]  # List of {competitor_id, recipient_email, round_id}
 
 @api_router.post("/admin/send-competitor-report")
 async def send_competitor_report(request: EmailRequest, admin: User = Depends(require_admin)):
