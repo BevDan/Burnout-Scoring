@@ -173,6 +173,7 @@ export default function AdminDashboard({ user, onLogout }) {
             <TabsTrigger value="classes" className="data-[state=active]:bg-[#f97316]">Classes</TabsTrigger>
             <TabsTrigger value="competitors" className="data-[state=active]:bg-[#f97316]">Competitors</TabsTrigger>
             <TabsTrigger value="rounds" className="data-[state=active]:bg-[#f97316]">Rounds</TabsTrigger>
+            <TabsTrigger value="scores" className="data-[state=active]:bg-[#f97316]">Scores</TabsTrigger>
           </TabsList>
 
           <TabsContent value="judges">
@@ -189,6 +190,10 @@ export default function AdminDashboard({ user, onLogout }) {
 
           <TabsContent value="rounds">
             <RoundsPanel rounds={rounds} onRefresh={fetchAllData} />
+          </TabsContent>
+
+          <TabsContent value="scores">
+            <ScoresPanel rounds={rounds} judges={judges} onRefresh={fetchAllData} />
           </TabsContent>
         </Tabs>
       </main>
