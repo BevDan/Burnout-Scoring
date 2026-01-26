@@ -33,14 +33,46 @@ class TestDisqualifiedPenalty(TestAuth):
     """Test disqualified penalty feature - zeros score"""
     
     def test_score_model_has_penalty_disqualified_field(self, auth_headers):
-        """Verify scores have penalty_disqualified field"""
-        response = requests.get(f"{BASE_URL}/api/admin/scores", headers=auth_headers)
+        """Verify new scores have penalty_disqualified field - older scores may not have it"""
+        # Submit a new score to verify the field is present
+        rounds_response = requests.get(f"{BASE_URL}/api/admin/rounds", headers=auth_headers)
+        competitors_response = requests.get(f"{BASE_URL}/api/admin/competitors", headers=auth_headers)
+        
+        rounds = rounds_response.json()
+        competitors = competitors_response.json()
+        
+        if len(rounds) == 0 or len(competitors) == 0:
+            pytest.skip("No rounds or competitors available")
+        
+        # Submit a test score
+        score_data = {
+            "competitor_id": competitors[0]["id"],
+            "round_id": rounds[0]["id"],
+            "tip_in": 5,
+            "instant_smoke": 5,
+            "constant_smoke": 10,
+            "volume_of_smoke": 10,
+            "driving_skill": 20,
+            "tyres_popped": 0,
+            "penalty_reversing": 0,
+            "penalty_stopping": 0,
+            "penalty_contact_barrier": 0,
+            "penalty_small_fire": 0,
+            "penalty_failed_drive_off": 0,
+            "penalty_large_fire": 0,
+            "penalty_disqualified": False
+        }
+        
+        response = requests.post(f"{BASE_URL}/api/judge/scores", json=score_data, headers=auth_headers)
         assert response.status_code == 200
-        scores = response.json()
-        if len(scores) > 0:
-            # Check that penalty_disqualified field exists
-            assert "penalty_disqualified" in scores[0] or scores[0].get("penalty_disqualified") is not None or "penalty_disqualified" in str(scores[0])
-            print(f"✓ Score model has penalty_disqualified field")
+        
+        score = response.json()
+        assert "penalty_disqualified" in score
+        assert score["penalty_disqualified"] == False
+        print(f"✓ New scores have penalty_disqualified field")
+        
+        # Clean up
+        requests.delete(f"{BASE_URL}/api/admin/scores/{score['id']}", headers=auth_headers)
     
     def test_submit_score_with_disqualified_zeros_final_score(self, auth_headers):
         """Test that submitting a score with penalty_disqualified=true results in final_score=0"""
