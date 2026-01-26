@@ -376,7 +376,28 @@ export default function Leaderboard({ user }) {
       </html>
     `);
     printWindow.document.close();
-    printWindow.print();
+    
+    // Wait for logo image to load before printing
+    if (logo) {
+      const logoImg = printWindow.document.querySelector('.logo');
+      if (logoImg) {
+        logoImg.onload = () => {
+          printWindow.print();
+        };
+        logoImg.onerror = () => {
+          // Print anyway if logo fails to load
+          printWindow.print();
+        };
+        // If image is already loaded (cached), print immediately
+        if (logoImg.complete) {
+          printWindow.print();
+        }
+      } else {
+        printWindow.print();
+      }
+    } else {
+      printWindow.print();
+    }
   };
 
   return (
