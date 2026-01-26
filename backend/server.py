@@ -204,22 +204,22 @@ class ScoreWithDetails(BaseModel):
     car_number: str
     round_id: str
     round_name: str
-    tip_in: float
-    instant_smoke: float
-    constant_smoke: float
-    volume_of_smoke: float
-    driving_skill: float
-    tyres_popped: int
-    penalty_reversing: int
-    penalty_stopping: int
-    penalty_contact_barrier: int
-    penalty_small_fire: int
-    penalty_failed_drive_off: int
-    penalty_large_fire: int
+    tip_in: float = 0
+    instant_smoke: float = 0
+    constant_smoke: float = 0
+    volume_of_smoke: float = 0
+    driving_skill: float = 0
+    tyres_popped: int = 0
+    penalty_reversing: int = 0
+    penalty_stopping: int = 0
+    penalty_contact_barrier: int = 0
+    penalty_small_fire: int = 0
+    penalty_failed_drive_off: int = 0
+    penalty_large_fire: int = 0
     penalty_disqualified: bool = False
-    score_subtotal: float
-    penalty_total: int
-    final_score: float
+    score_subtotal: float = 0
+    penalty_total: int = 0
+    final_score: float = 0
     email_sent: bool = False
     submitted_at: datetime
     edited_at: Optional[datetime] = None
