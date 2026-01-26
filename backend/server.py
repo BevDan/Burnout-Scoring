@@ -569,7 +569,8 @@ async def bulk_import_competitors(request: Request, admin: User = Depends(requir
                 car_number=row.get('car_number', ''),
                 vehicle_info=row.get('vehicle_info', ''),
                 plate=row.get('plate', ''),
-                class_id=resolved_class_id or ''
+                class_id=resolved_class_id or '',
+                email=row.get('email', '').strip()
             )
             doc = competitor.model_dump()
             doc['created_at'] = doc['created_at'].isoformat()
