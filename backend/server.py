@@ -103,17 +103,30 @@ class CompetitorWithClass(BaseModel):
     class_name: str
     created_at: datetime
 
-class Round(BaseModel):
+class Event(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     date: str
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class EventCreate(BaseModel):
+    name: str
+    date: str
+    is_active: bool = True
+
+class Round(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    is_minor: bool = False  # Minor rounds are used for cumulative scoring before finals
     round_status: str = "active"  # active or completed
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class RoundCreate(BaseModel):
     name: str
-    date: str
+    is_minor: bool = False
     round_status: str = "active"
 
 class Score(BaseModel):
