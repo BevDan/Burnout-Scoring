@@ -28,6 +28,11 @@ export default function AdminDashboard({ user, onLogout }) {
   const [profileData, setProfileData] = useState({ name: '', password: '' });
   const [resetConfirm, setResetConfirm] = useState('');
   const [isResetting, setIsResetting] = useState(false);
+  
+  // Logo and website settings
+  const [logo, setLogo] = useState(null);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [websiteSettings, setWebsiteSettings] = useState({ website_url: '', organization_name: '' });
 
   useEffect(() => {
     fetchAllData();
