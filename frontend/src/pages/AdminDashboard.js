@@ -1539,6 +1539,8 @@ function ScoresPanel({ rounds, judges, onRefresh }) {
   const [filterJudge, setFilterJudge] = useState('all');
   const [sortBy, setSortBy] = useState('car_number');
   const [loading, setLoading] = useState(false);
+  const [editScore, setEditScore] = useState(null);
+  const [editData, setEditData] = useState({});
 
   const fetchScores = async () => {
     setLoading(true);
@@ -1571,6 +1573,37 @@ function ScoresPanel({ rounds, judges, onRefresh }) {
       onRefresh();
     } catch (error) {
       toast.error('Failed to delete score');
+    }
+  };
+
+  const handleEdit = (score) => {
+    setEditScore(score);
+    setEditData({
+      tip_in: score.tip_in || 0,
+      instant_smoke: score.instant_smoke || 0,
+      constant_smoke: score.constant_smoke || 0,
+      volume_of_smoke: score.volume_of_smoke || 0,
+      driving_skill: score.driving_skill || 0,
+      tyres_popped: score.tyres_popped || 0,
+      penalty_reversing: score.penalty_reversing || 0,
+      penalty_stopping: score.penalty_stopping || 0,
+      penalty_contact_barrier: score.penalty_contact_barrier || 0,
+      penalty_small_fire: score.penalty_small_fire || 0,
+      penalty_failed_drive_off: score.penalty_failed_drive_off || 0,
+      penalty_large_fire: score.penalty_large_fire || 0,
+      penalty_disqualified: score.penalty_disqualified || false
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      await axios.put(`${API}/admin/scores/${editScore.id}`, editData, getAuthHeaders());
+      toast.success('Score updated');
+      setEditScore(null);
+      fetchScores();
+      onRefresh();
+    } catch (error) {
+      toast.error('Failed to update score');
     }
   };
 
