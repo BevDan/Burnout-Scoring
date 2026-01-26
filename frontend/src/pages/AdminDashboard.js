@@ -23,6 +23,7 @@ export default function AdminDashboard({ user, onLogout }) {
   const [classes, setClasses] = useState([]);
   const [competitors, setCompetitors] = useState([]);
   const [rounds, setRounds] = useState([]);
+  const [events, setEvents] = useState([]);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileData, setProfileData] = useState({ name: '', password: '' });
   const [resetConfirm, setResetConfirm] = useState('');
@@ -34,16 +35,18 @@ export default function AdminDashboard({ user, onLogout }) {
 
   const fetchAllData = async () => {
     try {
-      const [judgesRes, classesRes, competitorsRes, roundsRes] = await Promise.all([
+      const [judgesRes, classesRes, competitorsRes, roundsRes, eventsRes] = await Promise.all([
         axios.get(`${API}/admin/judges`, getAuthHeaders()),
         axios.get(`${API}/admin/classes`, getAuthHeaders()),
         axios.get(`${API}/admin/competitors`, getAuthHeaders()),
-        axios.get(`${API}/admin/rounds`, getAuthHeaders())
+        axios.get(`${API}/admin/rounds`, getAuthHeaders()),
+        axios.get(`${API}/admin/events`, getAuthHeaders())
       ]);
       setJudges(judgesRes.data);
       setClasses(classesRes.data);
       setCompetitors(competitorsRes.data);
       setRounds(roundsRes.data);
+      setEvents(eventsRes.data);
     } catch (error) {
       toast.error('Failed to load data');
     }
