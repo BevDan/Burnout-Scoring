@@ -249,6 +249,75 @@ export default function AdminDashboard({ user, onLogout }) {
         </div>
       </header>
 
+      {/* Scoring Errors Alert */}
+      {scoringErrors.length > 0 && (
+        <div className="max-w-7xl mx-auto px-6 pt-6" data-testid="scoring-errors-section">
+          <div className="bg-[#7f1d1d]/30 border border-[#ef4444] rounded-lg p-4">
+            <div className="flex items-start gap-3 mb-3">
+              <AlertCircle className="w-6 h-6 text-[#ef4444] flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="ui-font text-lg font-bold text-[#ef4444]">
+                  Scoring Issues Detected ({scoringErrors.length})
+                </h3>
+                <p className="text-sm text-[#fca5a5]">
+                  The following competitors have scoring issues that need attention.
+                  Active judges: {judges.filter(j => j.is_active !== false).length}
+                </p>
+              </div>
+            </div>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {scoringErrors.map((error, idx) => (
+                <div 
+                  key={idx}
+                  className="bg-[#09090b] p-3 rounded border border-[#27272a] flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="car-number-font text-lg font-bold text-[#f97316]">#{error.car_number}</span>
+                    <div>
+                      <p className="text-white font-medium">{error.competitor_name}</p>
+                      <p className="text-xs text-[#a1a1aa]">{error.round_name}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-semibold ${
+                      error.error_type === 'missing_scores' 
+                        ? 'bg-[#f59e0b]/20 text-[#f59e0b]' 
+                        : 'bg-[#ef4444]/20 text-[#ef4444]'
+                    }`}>
+                      {error.error_type === 'missing_scores' ? 'Missing Scores' : 'Duplicate Scores'}
+                    </span>
+                    <p className="text-xs text-[#a1a1aa] mt-1">{error.details}</p>
+                    <p className="text-xs text-[#71717a]">
+                      {error.judge_count}/{error.expected_count} judges
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Button 
+              onClick={fetchScoringErrors} 
+              variant="outline" 
+              size="sm" 
+              className="mt-3 border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
+            >
+              Refresh Errors
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* No Errors - Success indicator */}
+      {scoringErrors.length === 0 && judges.filter(j => j.is_active !== false).length > 0 && (
+        <div className="max-w-7xl mx-auto px-6 pt-6">
+          <div className="bg-[#14532d]/30 border border-[#22c55e] rounded-lg p-3 flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-[#22c55e]" />
+            <p className="text-[#86efac] text-sm">
+              No scoring issues detected. Active judges: {judges.filter(j => j.is_active !== false).length}
+            </p>
+          </div>
+        </div>
+      )}
+
       <main className="max-w-7xl mx-auto px-6 py-8">
         <Tabs defaultValue="judges" className="space-y-6">
           <TabsList className="bg-[#18181b] border border-[#27272a] p-1">
@@ -261,7 +330,7 @@ export default function AdminDashboard({ user, onLogout }) {
           </TabsList>
 
           <TabsContent value="judges">
-            <JudgesPanel judges={judges} onRefresh={fetchAllData} />
+            <JudgesPanel judges={judges} onRefresh={() => { fetchAllData(); fetchScoringErrors(); }} />
           </TabsContent>
 
           <TabsContent value="classes">
