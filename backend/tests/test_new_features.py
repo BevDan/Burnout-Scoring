@@ -165,14 +165,46 @@ class TestEmailTracking(TestAuth):
     """Test email tracking feature"""
     
     def test_score_model_has_email_sent_field(self, auth_headers):
-        """Verify scores have email_sent field"""
-        response = requests.get(f"{BASE_URL}/api/admin/scores", headers=auth_headers)
+        """Verify new scores have email_sent field - older scores may not have it"""
+        # Submit a new score to verify the field is present
+        rounds_response = requests.get(f"{BASE_URL}/api/admin/rounds", headers=auth_headers)
+        competitors_response = requests.get(f"{BASE_URL}/api/admin/competitors", headers=auth_headers)
+        
+        rounds = rounds_response.json()
+        competitors = competitors_response.json()
+        
+        if len(rounds) == 0 or len(competitors) == 0:
+            pytest.skip("No rounds or competitors available")
+        
+        # Submit a test score
+        score_data = {
+            "competitor_id": competitors[0]["id"],
+            "round_id": rounds[0]["id"],
+            "tip_in": 5,
+            "instant_smoke": 5,
+            "constant_smoke": 10,
+            "volume_of_smoke": 10,
+            "driving_skill": 20,
+            "tyres_popped": 0,
+            "penalty_reversing": 0,
+            "penalty_stopping": 0,
+            "penalty_contact_barrier": 0,
+            "penalty_small_fire": 0,
+            "penalty_failed_drive_off": 0,
+            "penalty_large_fire": 0,
+            "penalty_disqualified": False
+        }
+        
+        response = requests.post(f"{BASE_URL}/api/judge/scores", json=score_data, headers=auth_headers)
         assert response.status_code == 200
-        scores = response.json()
-        if len(scores) > 0:
-            # email_sent should be present (default false)
-            assert "email_sent" in scores[0] or scores[0].get("email_sent") is not None
-            print(f"✓ Score model has email_sent field")
+        
+        score = response.json()
+        assert "email_sent" in score
+        assert score["email_sent"] == False  # Default value
+        print(f"✓ New scores have email_sent field (default: False)")
+        
+        # Clean up
+        requests.delete(f"{BASE_URL}/api/admin/scores/{score['id']}", headers=auth_headers)
     
     def test_pending_emails_endpoint_exists(self, auth_headers):
         """Test GET /api/admin/pending-emails endpoint exists and returns correct structure"""
