@@ -1052,13 +1052,13 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label>CSV Format: name,car_number,vehicle_info,plate,class_name</Label>
-                  <p className="text-xs text-[#a1a1aa] mb-2">Use the class NAME (not ID) - e.g., "Pro Class", "Street Class"</p>
+                  <Label>CSV Format: name,car_number,vehicle_info,plate,class_name,email</Label>
+                  <p className="text-xs text-[#a1a1aa] mb-2">Use the class NAME (not ID). Email is optional.</p>
                   <textarea
                     value={csvData}
                     onChange={(e) => setCsvData(e.target.value)}
                     className="w-full h-48 p-3 bg-[#09090b] border border-[#27272a] rounded text-white data-font text-sm"
-                    placeholder="name,car_number,vehicle_info,plate,class_name&#10;John Doe,42,Ford Mustang,BURNOUT1,Pro Class&#10;Jane Smith,88,Chevy Camaro,SMOKEY,Street Class"
+                    placeholder="name,car_number,vehicle_info,plate,class_name,email&#10;John Doe,42,Ford Mustang,BURNOUT1,Pro Class,john@email.com&#10;Jane Smith,88,Chevy Camaro,SMOKEY,Street Class,jane@email.com"
                     data-testid="csv-textarea"
                   />
                 </div>
@@ -1080,22 +1080,35 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
                 <DialogTitle className="ui-font text-xl">Create New Competitor</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                <div>
-                  <Label>Name</Label>
-                  <Input
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="bg-[#09090b] border-[#27272a]"
-                    data-testid="competitor-name-input"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Name</Label>
+                    <Input
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="bg-[#09090b] border-[#27272a]"
+                      data-testid="competitor-name-input"
+                    />
+                  </div>
+                  <div>
+                    <Label>Car Number</Label>
+                    <Input
+                      value={formData.car_number}
+                      onChange={(e) => setFormData({ ...formData, car_number: e.target.value })}
+                      className="bg-[#09090b] border-[#27272a]"
+                      data-testid="competitor-car-number-input"
+                    />
+                  </div>
                 </div>
                 <div>
-                  <Label>Car Number</Label>
+                  <Label>Email Address</Label>
                   <Input
-                    value={formData.car_number}
-                    onChange={(e) => setFormData({ ...formData, car_number: e.target.value })}
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="competitor@email.com"
                     className="bg-[#09090b] border-[#27272a]"
-                    data-testid="competitor-car-number-input"
+                    data-testid="competitor-email-input"
                   />
                 </div>
                 <div>
