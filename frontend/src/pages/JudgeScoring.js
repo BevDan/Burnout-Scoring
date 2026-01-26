@@ -44,7 +44,8 @@ export default function JudgeScoring({ user, onLogout }) {
     penalty_contact_barrier: 0,
     penalty_small_fire: 0,
     penalty_failed_drive_off: 0,
-    penalty_large_fire: 0
+    penalty_large_fire: 0,
+    penalty_disqualified: false
   });
 
   useEffect(() => {
