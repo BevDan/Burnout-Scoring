@@ -1899,12 +1899,20 @@ async def generate_competitor_email_html(competitor_id: str, round_id: Optional[
                 html += '<td style="color:#dc2626;">0 (DQ)</td>'
             else:
                 html += f'<td>{final}</td>'
-        html += '</tr></table></div>'
+        html += '</tr></table>'
+        
+        # Add round summary (total and average for this round)
+        round_total = sum(total_scores[-len(round_scores):])  # Only scores from this round
+        round_avg = round_total / len(round_scores) if round_scores else 0
+        html += f'''<div style="background:#f0fdf4;padding:10px;text-align:right;border-top:2px solid #22c55e;">
+            <strong>Round Total: {round_total:.1f}</strong> &nbsp;|&nbsp; Average: {round_avg:.2f}
+        </div></div>'''
     
-    if total_scores:
+    # Only show overall summary if multiple rounds
+    if len(scores_by_round) > 1 and total_scores:
         html += f'''<div class="summary-box">
-            <div>Total Score: <span class="summary-score">{sum(total_scores)}</span></div>
-            <div style="color:#666;margin-top:5px;">Average: {sum(total_scores)/len(total_scores):.2f}</div>
+            <div>Overall Total: <span class="summary-score">{sum(total_scores)}</span></div>
+            <div style="color:#666;margin-top:5px;">Overall Average: {sum(total_scores)/len(total_scores):.2f} (from {len(scores_by_round)} round(s))</div>
         </div>'''
     
     html += f'<div class="footer">Generated on {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}<br/>{website_url}</div></body></html>'
