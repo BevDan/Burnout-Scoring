@@ -99,6 +99,7 @@ class CompetitorCreate(BaseModel):
     vehicle_info: str
     plate: str
     class_id: str
+    email: Optional[str] = ""
 
 class CompetitorWithClass(BaseModel):
     id: str
