@@ -1700,25 +1700,218 @@ function ScoresPanel({ rounds, judges, onRefresh }) {
                 </div>
                 <div>
                   <p className="text-xs text-[#a1a1aa]">Final Score</p>
-                  <p className="text-[#22c55e] font-bold data-font text-lg">{score.final_score}</p>
+                  <p className={`font-bold data-font text-lg ${score.penalty_disqualified ? 'text-[#ef4444]' : 'text-[#22c55e]'}`}>
+                    {score.penalty_disqualified ? '0 (DQ)' : score.final_score}
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-[#a1a1aa]">Submitted</p>
                   <p className="text-white text-sm">{new Date(score.submitted_at).toLocaleString()}</p>
                 </div>
               </div>
-              <Button
-                onClick={() => handleDelete(score.id)}
-                variant="destructive"
-                size="sm"
-                className="ml-4"
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
+              <div className="flex gap-2 ml-4">
+                <Button
+                  onClick={() => handleEdit(score)}
+                  variant="outline"
+                  size="sm"
+                  className="border-[#f97316] text-[#f97316] hover:bg-[#f97316] hover:text-white"
+                >
+                  Edit
+                </Button>
+                <Button
+                  onClick={() => handleDelete(score.id)}
+                  variant="destructive"
+                  size="sm"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
           ))}
         </div>
       )}
+
+      {/* Edit Score Dialog */}
+      <Dialog open={!!editScore} onOpenChange={() => setEditScore(null)}>
+        <DialogContent className="bg-[#18181b] border-[#27272a] text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="ui-font text-xl">
+              Edit Score - #{editScore?.car_number} {editScore?.competitor_name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-[#a1a1aa]">
+              Round: {editScore?.round_name} | Judge: {editScore?.judge_name}
+            </p>
+            
+            {/* Scoring Categories */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-xs">Tip In (0-10)</Label>
+                <Input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="10"
+                  value={editData.tip_in}
+                  onChange={(e) => setEditData({...editData, tip_in: parseFloat(e.target.value) || 0})}
+                  className="bg-[#09090b] border-[#27272a]"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Instant Smoke (0-10)</Label>
+                <Input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="10"
+                  value={editData.instant_smoke}
+                  onChange={(e) => setEditData({...editData, instant_smoke: parseFloat(e.target.value) || 0})}
+                  className="bg-[#09090b] border-[#27272a]"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Constant Smoke (0-20)</Label>
+                <Input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="20"
+                  value={editData.constant_smoke}
+                  onChange={(e) => setEditData({...editData, constant_smoke: parseFloat(e.target.value) || 0})}
+                  className="bg-[#09090b] border-[#27272a]"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Volume of Smoke (0-20)</Label>
+                <Input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="20"
+                  value={editData.volume_of_smoke}
+                  onChange={(e) => setEditData({...editData, volume_of_smoke: parseFloat(e.target.value) || 0})}
+                  className="bg-[#09090b] border-[#27272a]"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Driving Skill (0-40)</Label>
+                <Input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="40"
+                  value={editData.driving_skill}
+                  onChange={(e) => setEditData({...editData, driving_skill: parseFloat(e.target.value) || 0})}
+                  className="bg-[#09090b] border-[#27272a]"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Tyres Popped (0-2)</Label>
+                <Input
+                  type="number"
+                  step="1"
+                  min="0"
+                  max="2"
+                  value={editData.tyres_popped}
+                  onChange={(e) => setEditData({...editData, tyres_popped: parseInt(e.target.value) || 0})}
+                  className="bg-[#09090b] border-[#27272a]"
+                />
+              </div>
+            </div>
+
+            {/* Penalties */}
+            <div className="border-t border-[#27272a] pt-4">
+              <Label className="text-sm font-semibold text-[#ef4444] mb-2 block">Penalties</Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-xs">Reversing (-5 each)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={editData.penalty_reversing}
+                    onChange={(e) => setEditData({...editData, penalty_reversing: parseInt(e.target.value) || 0})}
+                    className="bg-[#09090b] border-[#27272a]"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Stopping (-5 each)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={editData.penalty_stopping}
+                    onChange={(e) => setEditData({...editData, penalty_stopping: parseInt(e.target.value) || 0})}
+                    className="bg-[#09090b] border-[#27272a]"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Contact with Barrier (-5 each)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={editData.penalty_contact_barrier}
+                    onChange={(e) => setEditData({...editData, penalty_contact_barrier: parseInt(e.target.value) || 0})}
+                    className="bg-[#09090b] border-[#27272a]"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Small Fire (-5 each)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={editData.penalty_small_fire}
+                    onChange={(e) => setEditData({...editData, penalty_small_fire: parseInt(e.target.value) || 0})}
+                    className="bg-[#09090b] border-[#27272a]"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={editData.penalty_failed_drive_off > 0}
+                    onChange={(e) => setEditData({...editData, penalty_failed_drive_off: e.target.checked ? 1 : 0})}
+                    className="w-4 h-4"
+                  />
+                  <Label className="text-xs">Failed to Drive Off (-10)</Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={editData.penalty_large_fire > 0}
+                    onChange={(e) => setEditData({...editData, penalty_large_fire: e.target.checked ? 1 : 0})}
+                    className="w-4 h-4"
+                  />
+                  <Label className="text-xs">Large Fire (-10)</Label>
+                </div>
+              </div>
+              
+              {/* Disqualified */}
+              <div className="mt-4 p-3 border border-[#ef4444] rounded bg-[#7f1d1d]/20">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={editData.penalty_disqualified}
+                    onChange={(e) => setEditData({...editData, penalty_disqualified: e.target.checked})}
+                    className="w-5 h-5"
+                  />
+                  <div>
+                    <Label className="text-sm font-bold text-[#ef4444]">DISQUALIFIED</Label>
+                    <p className="text-xs text-[#a1a1aa]">If checked, final score will be 0</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4">
+              <Button variant="outline" onClick={() => setEditScore(null)} className="border-[#27272a]">
+                Cancel
+              </Button>
+              <Button onClick={handleSaveEdit} className="btn-primary">
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
