@@ -896,15 +896,17 @@ function RoundsPanel({ rounds, onRefresh }) {
                   data-testid="round-name-input"
                 />
               </div>
-              <div>
-                <Label>Date</Label>
-                <Input
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="bg-[#09090b] border-[#27272a]"
-                  data-testid="round-date-input"
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="is_minor"
+                  checked={formData.is_minor}
+                  onChange={(e) => setFormData({ ...formData, is_minor: e.target.checked })}
+                  className="w-4 h-4 rounded border-[#27272a] bg-[#09090b]"
                 />
+                <Label htmlFor="is_minor" className="cursor-pointer">
+                  Minor Round (for cumulative scoring before finals)
+                </Label>
               </div>
               <div>
                 <Label>Status</Label>
@@ -939,14 +941,17 @@ function RoundsPanel({ rounds, onRefresh }) {
                   className="bg-[#09090b] border-[#27272a]"
                 />
               </div>
-              <div>
-                <Label>Date</Label>
-                <Input
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="bg-[#09090b] border-[#27272a]"
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="edit_is_minor"
+                  checked={formData.is_minor}
+                  onChange={(e) => setFormData({ ...formData, is_minor: e.target.checked })}
+                  className="w-4 h-4 rounded border-[#27272a] bg-[#09090b]"
                 />
+                <Label htmlFor="edit_is_minor" className="cursor-pointer">
+                  Minor Round (for cumulative scoring before finals)
+                </Label>
               </div>
               <div>
                 <Label>Status</Label>
