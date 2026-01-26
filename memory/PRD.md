@@ -83,6 +83,8 @@ Build a full-stack web application to score a burnout competition with:
 - [x] **Website & Organization settings**
 - [x] **Professional print layout matching PDF examples**
 - [x] Footer with timestamp and website URL
+- [x] **Settings persistence (Score Display, Show Scores) via localStorage**
+- [x] **Logo properly displays in print preview (waits for image load)**
 
 ---
 
