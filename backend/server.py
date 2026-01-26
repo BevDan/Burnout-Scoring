@@ -1979,7 +1979,7 @@ async def send_bulk_emails(request: BulkEmailRequest, admin: User = Depends(requ
                 # Mark scores as emailed for this round
                 score_filter = {"competitor_id": competitor_id}
                 if round_id:
-                    score_filter["round_id"] = request.round_id
+                    score_filter["round_id"] = round_id
                 await db.scores.update_many(score_filter, {"$set": {"email_sent": True}})
                 
                 results["sent"].append({"competitor_id": competitor_id, "email": recipient_email, "name": competitor.get("name")})

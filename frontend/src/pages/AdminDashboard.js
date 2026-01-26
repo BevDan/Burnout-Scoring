@@ -1771,6 +1771,7 @@ function ScoresPanel({ rounds, judges, competitors, pendingEmails, onRefresh }) 
         competitor_id: p.competitor_id,
         competitor_name: p.competitor_name,
         car_number: p.car_number,
+        round_id: p.round_id,
         round_name: p.round_name,
         email: comp?.email || '',
         selected: true
@@ -1792,7 +1793,8 @@ function ScoresPanel({ rounds, judges, competitors, pendingEmails, onRefresh }) 
       const response = await axios.post(`${API}/admin/send-bulk-emails`, {
         competitor_emails: selected.map(s => ({
           competitor_id: s.competitor_id,
-          recipient_email: s.email
+          recipient_email: s.email,
+          round_id: s.round_id
         }))
       }, getAuthHeaders());
       
