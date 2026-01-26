@@ -1736,6 +1736,55 @@ function ScoresPanel({ rounds, judges, competitors, pendingEmails, onRefresh }) 
     }
   };
 
+  const handleOpenBulkEmail = () => {
+    // Initialize bulk email data from pending emails list and competitors
+    const emailData = (pendingEmails?.competitors_list || []).map(p => {
+      const comp = competitors?.find(c => c.id === p.competitor_id);
+      return {
+        competitor_id: p.competitor_id,
+        competitor_name: p.competitor_name,
+        car_number: p.car_number,
+        round_name: p.round_name,
+        email: comp?.email || '',
+        selected: true
+      };
+    });
+    setBulkEmailData(emailData);
+    setBulkEmailDialog(true);
+  };
+
+  const handleSendBulkEmails = async () => {
+    const selected = bulkEmailData.filter(d => d.selected && d.email);
+    if (selected.length === 0) {
+      toast.error('No valid emails selected');
+      return;
+    }
+
+    setSendingBulk(true);
+    try {
+      const response = await axios.post(`${API}/admin/send-bulk-emails`, {
+        competitor_emails: selected.map(s => ({
+          competitor_id: s.competitor_id,
+          recipient_email: s.email
+        }))
+      }, getAuthHeaders());
+      
+      toast.success(response.data.message);
+      if (response.data.failed?.length > 0) {
+        response.data.failed.forEach(f => {
+          toast.error(`Failed: #${f.competitor_id} - ${f.error}`);
+        });
+      }
+      setBulkEmailDialog(false);
+      fetchScores();
+      onRefresh();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to send bulk emails');
+    } finally {
+      setSendingBulk(false);
+    }
+  };
+
   const handleSaveEdit = async () => {
     try {
       await axios.put(`${API}/admin/scores/${editScore.id}`, editData, getAuthHeaders());
