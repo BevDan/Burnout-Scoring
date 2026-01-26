@@ -498,6 +498,27 @@ export default function JudgeScoring({ user, onLogout }) {
               testId="penalty-large-fire"
             />
           </div>
+          
+          {/* Disqualified Toggle - Standalone */}
+          <div className="pt-4 border-t border-[#27272a]">
+            <button
+              onClick={() => setScoreData({...scoreData, penalty_disqualified: !scoreData.penalty_disqualified})}
+              className={`w-full p-4 rounded-lg border-2 transition-all flex items-center justify-between ${
+                scoreData.penalty_disqualified 
+                  ? 'bg-[#7f1d1d] border-[#ef4444] text-white' 
+                  : 'bg-[#18181b] border-[#27272a] text-[#a1a1aa] hover:border-[#ef4444]'
+              }`}
+              data-testid="penalty-disqualified"
+            >
+              <div className="flex items-center gap-3">
+                <AlertTriangle className={`w-6 h-6 ${scoreData.penalty_disqualified ? 'text-white' : 'text-[#ef4444]'}`} />
+                <span className="ui-font text-lg font-bold tracking-wide">DISQUALIFIED</span>
+              </div>
+              <span className="ui-font text-sm">
+                {scoreData.penalty_disqualified ? 'YES - Score will be 0' : 'No'}
+              </span>
+            </button>
+          </div>
         </div>
 
         <div className="glass-panel p-6 rounded-lg border-2 border-[#f97316] neon-glow space-y-4">
@@ -512,7 +533,9 @@ export default function JudgeScoring({ user, onLogout }) {
             </div>
             <div>
               <p className="ui-font text-sm tracking-wide text-[#a1a1aa] uppercase">Final Score</p>
-              <p className="data-font text-5xl font-bold text-[#f97316]" data-testid="final-score">{totals.final}</p>
+              <p className={`data-font text-5xl font-bold ${scoreData.penalty_disqualified ? 'text-[#ef4444]' : 'text-[#f97316]'}`} data-testid="final-score">
+                {scoreData.penalty_disqualified ? '0 (DQ)' : totals.final}
+              </p>
             </div>
           </div>
 
