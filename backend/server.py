@@ -1935,9 +1935,46 @@ async def generate_competitor_email_html(competitor_id: str, round_id: Optional[
                 html += f'<td>{score.get(cat_key, 0)}</td>'
             html += '</tr>'
         
-        html += '<tr style="background:#fef2f2;"><td><strong>Penalties</strong></td>'
+        # Penalty breakdown - show individual penalties
+        penalty_types = [
+            ("Reversing (-5)", "penalty_reversing"),
+            ("Stopping (-5)", "penalty_stopping"),
+            ("Contact Barrier (-5)", "penalty_contact_barrier"),
+            ("Small Fire (-5)", "penalty_small_fire"),
+            ("Failed Drive Off (-10)", "penalty_failed_drive_off"),
+            ("Large Fire (-10)", "penalty_large_fire")
+        ]
+        
+        html += '<tr style="background:#fef2f2;"><td colspan="100%" style="font-weight:bold;color:#dc2626;padding-top:10px;">Penalties</td></tr>'
+        
+        for penalty_name, penalty_key in penalty_types:
+            # Check if any judge applied this penalty
+            has_penalty = any(score.get(penalty_key, 0) > 0 for score in round_scores)
+            if has_penalty:
+                html += f'<tr style="background:#fef2f2;"><td style="padding-left:20px;color:#991b1b;">{penalty_name}</td>'
+                for score in round_scores:
+                    penalty_val = score.get(penalty_key, 0)
+                    if penalty_val > 0:
+                        html += f'<td style="color:#dc2626;">-{penalty_val}</td>'
+                    else:
+                        html += '<td style="color:#999;">-</td>'
+                html += '</tr>'
+        
+        # Show disqualified status if any
+        has_dq = any(score.get("penalty_disqualified", False) for score in round_scores)
+        if has_dq:
+            html += '<tr style="background:#fef2f2;"><td style="padding-left:20px;color:#991b1b;font-weight:bold;">DISQUALIFIED</td>'
+            for score in round_scores:
+                if score.get("penalty_disqualified", False):
+                    html += '<td style="color:#dc2626;font-weight:bold;">YES</td>'
+                else:
+                    html += '<td style="color:#999;">-</td>'
+            html += '</tr>'
+        
+        # Penalty total row
+        html += '<tr style="background:#fef2f2;border-top:1px solid #fca5a5;"><td style="font-weight:bold;">Total Penalties</td>'
         for score in round_scores:
-            html += f'<td style="color:#dc2626;">-{score.get("penalty_total", 0)}</td>'
+            html += f'<td style="color:#dc2626;font-weight:bold;">-{score.get("penalty_total", 0)}</td>'
         html += '</tr>'
         
         html += '<tr class="total-row"><td>Final Score</td>'
