@@ -83,6 +83,13 @@ export default function AdminDashboard({ user, onLogout }) {
     } catch (error) {
       // Settings might not exist yet
     }
+    // Fetch SMTP settings separately (requires auth)
+    try {
+      const smtpRes = await axios.get(`${API}/admin/settings/smtp`, getAuthHeaders());
+      setSmtpSettings(smtpRes.data);
+    } catch (error) {
+      // SMTP settings might not exist yet
+    }
   };
 
   const handleLogoUpload = async (e) => {
