@@ -124,6 +124,8 @@ Build a full-stack web application to score a burnout competition with:
 - [x] **Frontend sends round_id** - Bulk email dialog now includes round_id in the payload
 - [x] **Only specific round marked as sent** - Fixed bug where all rounds were marked as emailed
 - [x] **Partial scoring exclusion** - Competitor/round combos only appear in pending emails when ALL active judges have scored
+- [x] **Comprehensive email reports** - Bulk email includes ALL completed rounds (previously emailed + newly completed) in one email
+- [x] **Cumulative progress tracking** - Only the newly completed round is marked as "emailed", allowing future rounds to trigger new comprehensive emails
 
 ---
 
