@@ -217,7 +217,19 @@ class LeaderboardEntry(BaseModel):
     car_number: str
     vehicle_info: str
     class_name: str
+    total_score: float
     average_score: float
+    score_count: int
+
+class MinorRoundsLeaderboardEntry(BaseModel):
+    competitor_id: str
+    competitor_name: str
+    car_number: str
+    vehicle_info: str
+    class_name: str
+    total_score: float
+    average_score: float
+    rounds_competed: int
     score_count: int
 
 # Helper functions
