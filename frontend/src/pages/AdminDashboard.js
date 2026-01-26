@@ -597,10 +597,26 @@ function JudgesPanel({ judges, onRefresh }) {
     }
   };
 
+  const handleToggleActive = async (judgeId) => {
+    try {
+      await axios.put(`${API}/admin/judges/${judgeId}/toggle-active`, {}, getAuthHeaders());
+      onRefresh();
+    } catch (error) {
+      toast.error('Failed to update judge status');
+    }
+  };
+
+  const activeCount = judges.filter(j => j.is_active !== false).length;
+
   return (
     <div className="glass-panel p-6 rounded-lg border border-[#27272a]">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="ui-font text-2xl font-bold tracking-wide text-white">JUDGES</h2>
+        <div>
+          <h2 className="ui-font text-2xl font-bold tracking-wide text-white">JUDGES</h2>
+          <p className="text-sm text-[#a1a1aa]">
+            <span className="text-[#22c55e] font-semibold">{activeCount}</span> active judge{activeCount !== 1 ? 's' : ''} for this event
+          </p>
+        </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button className="btn-primary" data-testid="add-judge-button">
@@ -650,22 +666,50 @@ function JudgesPanel({ judges, onRefresh }) {
       </div>
 
       <div className="space-y-3">
-        {judges.map((judge) => (
-          <div key={judge.id} className="bg-[#18181b] p-4 rounded border border-[#27272a] flex justify-between items-center">
-            <div>
-              <p className="ui-font text-lg font-semibold text-white">{judge.name}</p>
-              <p className="data-font text-sm text-[#a1a1aa]">{judge.username}</p>
-            </div>
-            <Button
-              onClick={() => handleDelete(judge.id)}
-              variant="destructive"
-              size="sm"
-              data-testid={`delete-judge-${judge.id}`}
+        {judges.map((judge) => {
+          const isActive = judge.is_active !== false;
+          return (
+            <div 
+              key={judge.id} 
+              className={`bg-[#18181b] p-4 rounded border flex justify-between items-center ${
+                isActive ? 'border-[#27272a]' : 'border-[#27272a] opacity-60'
+              }`}
             >
-              Delete
-            </Button>
-          </div>
-        ))}
+              <div className="flex items-center gap-4">
+                {/* Active Toggle */}
+                <button
+                  onClick={() => handleToggleActive(judge.id)}
+                  className={`w-12 h-6 rounded-full transition-colors relative ${
+                    isActive ? 'bg-[#22c55e]' : 'bg-[#3f3f46]'
+                  }`}
+                  title={isActive ? 'Active - click to deactivate' : 'Inactive - click to activate'}
+                  data-testid={`toggle-judge-${judge.id}`}
+                >
+                  <span 
+                    className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                      isActive ? 'translate-x-6' : 'translate-x-0.5'
+                    }`}
+                  />
+                </button>
+                <div>
+                  <p className={`ui-font text-lg font-semibold ${isActive ? 'text-white' : 'text-[#71717a]'}`}>
+                    {judge.name}
+                    {!isActive && <span className="ml-2 text-xs text-[#71717a]">(Inactive)</span>}
+                  </p>
+                  <p className="data-font text-sm text-[#a1a1aa]">{judge.username}</p>
+                </div>
+              </div>
+              <Button
+                onClick={() => handleDelete(judge.id)}
+                variant="destructive"
+                size="sm"
+                data-testid={`delete-judge-${judge.id}`}
+              >
+                Delete
+              </Button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
