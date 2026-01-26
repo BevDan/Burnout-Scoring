@@ -1012,3 +1012,161 @@ function RoundsPanel({ rounds, onRefresh }) {
     </div>
   );
 }
+
+
+function ScoresPanel({ rounds, judges, onRefresh }) {
+  const [scores, setScores] = useState([]);
+  const [filterRound, setFilterRound] = useState('all');
+  const [filterJudge, setFilterJudge] = useState('all');
+  const [sortBy, setSortBy] = useState('car_number');
+  const [loading, setLoading] = useState(false);
+
+  const fetchScores = async () => {
+    setLoading(true);
+    try {
+      let url = `${API}/admin/scores`;
+      const params = new URLSearchParams();
+      if (filterRound !== 'all') params.append('round_id', filterRound);
+      if (filterJudge !== 'all') params.append('judge_id', filterJudge);
+      if (params.toString()) url += `?${params.toString()}`;
+      
+      const response = await axios.get(url, getAuthHeaders());
+      setScores(response.data);
+    } catch (error) {
+      toast.error('Failed to load scores');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchScores();
+  }, [filterRound, filterJudge]);
+
+  const handleDelete = async (scoreId) => {
+    if (!window.confirm('Delete this score? This cannot be undone.')) return;
+    try {
+      await axios.delete(`${API}/admin/scores/${scoreId}`, getAuthHeaders());
+      toast.success('Score deleted');
+      fetchScores();
+      onRefresh();
+    } catch (error) {
+      toast.error('Failed to delete score');
+    }
+  };
+
+  const sortedScores = [...scores].sort((a, b) => {
+    if (sortBy === 'car_number') {
+      return (parseInt(a.car_number) || 0) - (parseInt(b.car_number) || 0);
+    } else if (sortBy === 'competitor_name') {
+      return a.competitor_name.localeCompare(b.competitor_name);
+    } else if (sortBy === 'judge_name') {
+      return a.judge_name.localeCompare(b.judge_name);
+    } else if (sortBy === 'final_score') {
+      return b.final_score - a.final_score;
+    }
+    return 0;
+  });
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-wrap gap-4 items-end">
+        <div>
+          <Label className="text-xs text-[#a1a1aa]">Filter by Round</Label>
+          <Select value={filterRound} onValueChange={setFilterRound}>
+            <SelectTrigger className="w-48 bg-[#18181b] border-[#27272a]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-[#18181b] border-[#27272a]">
+              <SelectItem value="all">All Rounds</SelectItem>
+              {rounds.map((r) => (
+                <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label className="text-xs text-[#a1a1aa]">Filter by Judge</Label>
+          <Select value={filterJudge} onValueChange={setFilterJudge}>
+            <SelectTrigger className="w-48 bg-[#18181b] border-[#27272a]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-[#18181b] border-[#27272a]">
+              <SelectItem value="all">All Judges</SelectItem>
+              {judges.map((j) => (
+                <SelectItem key={j.id} value={j.id}>{j.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label className="text-xs text-[#a1a1aa]">Sort by</Label>
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-48 bg-[#18181b] border-[#27272a]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-[#18181b] border-[#27272a]">
+              <SelectItem value="car_number">Car Number</SelectItem>
+              <SelectItem value="competitor_name">Competitor Name</SelectItem>
+              <SelectItem value="judge_name">Judge Name</SelectItem>
+              <SelectItem value="final_score">Final Score</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="ml-auto">
+          <p className="text-sm text-[#a1a1aa]">{scores.length} scores found</p>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-12 bg-[#18181b] rounded border border-[#27272a]">
+          <p className="text-[#a1a1aa]">Loading scores...</p>
+        </div>
+      ) : scores.length === 0 ? (
+        <div className="text-center py-12 bg-[#18181b] rounded border border-[#27272a]">
+          <ClipboardList className="w-12 h-12 text-[#a1a1aa] mx-auto mb-3" />
+          <p className="text-[#a1a1aa]">No scores found with current filters.</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {sortedScores.map((score) => (
+            <div key={score.id} className="bg-[#18181b] p-4 rounded border border-[#27272a] flex justify-between items-center">
+              <div className="flex-1 grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div>
+                  <p className="text-xs text-[#a1a1aa]">Competitor</p>
+                  <p className="text-white font-semibold">
+                    <span className="car-number-font text-[#f97316]">#{score.car_number}</span> {score.competitor_name}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#a1a1aa]">Round</p>
+                  <p className="text-white">{score.round_name}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#a1a1aa]">Judge</p>
+                  <p className="text-white">{score.judge_name}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#a1a1aa]">Final Score</p>
+                  <p className="text-[#22c55e] font-bold data-font text-lg">{score.final_score}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#a1a1aa]">Submitted</p>
+                  <p className="text-white text-sm">{new Date(score.submitted_at).toLocaleString()}</p>
+                </div>
+              </div>
+              <Button
+                onClick={() => handleDelete(score.id)}
+                variant="destructive"
+                size="sm"
+                className="ml-4"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
