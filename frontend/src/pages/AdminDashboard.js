@@ -1161,6 +1161,7 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
                   <p className="ui-font text-lg font-semibold text-white">{comp.name}</p>
                   <p className="text-sm text-[#a1a1aa]">{comp.vehicle_info}</p>
                   <p className="text-sm text-[#22c55e] data-font">Plate: {comp.plate}</p>
+                  {comp.email && <p className="text-sm text-[#3b82f6]">{comp.email}</p>}
                   <p className="text-xs text-[#f97316] mt-1">{comp.class_name}</p>
                 </div>
               </div>
@@ -1194,19 +1195,31 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
             <DialogTitle className="ui-font text-xl">Edit Competitor</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div>
-              <Label>Name</Label>
-              <Input
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="bg-[#09090b] border-[#27272a]"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Name</Label>
+                <Input
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="bg-[#09090b] border-[#27272a]"
+                />
+              </div>
+              <div>
+                <Label>Car Number</Label>
+                <Input
+                  value={formData.car_number}
+                  onChange={(e) => setFormData({ ...formData, car_number: e.target.value })}
+                  className="bg-[#09090b] border-[#27272a]"
+                />
+              </div>
             </div>
             <div>
-              <Label>Car Number</Label>
+              <Label>Email Address</Label>
               <Input
-                value={formData.car_number}
-                onChange={(e) => setFormData({ ...formData, car_number: e.target.value })}
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="competitor@email.com"
                 className="bg-[#09090b] border-[#27272a]"
               />
             </div>
