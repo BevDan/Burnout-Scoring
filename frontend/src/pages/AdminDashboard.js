@@ -966,14 +966,14 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
   const [editOpen, setEditOpen] = useState(false);
   const [editingCompetitor, setEditingCompetitor] = useState(null);
   const [csvData, setCsvData] = useState('');
-  const [formData, setFormData] = useState({ name: '', car_number: '', vehicle_info: '', plate: '', class_id: '' });
+  const [formData, setFormData] = useState({ name: '', car_number: '', vehicle_info: '', plate: '', class_id: '', email: '' });
 
   const handleCreate = async () => {
     try {
       await axios.post(`${API}/admin/competitors`, formData, getAuthHeaders());
       toast.success('Competitor created successfully');
       setOpen(false);
-      setFormData({ name: '', car_number: '', vehicle_info: '', plate: '', class_id: '' });
+      setFormData({ name: '', car_number: '', vehicle_info: '', plate: '', class_id: '', email: '' });
       onRefresh();
     } catch (error) {
       toast.error('Failed to create competitor');
@@ -1004,7 +1004,8 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
       car_number: competitor.car_number,
       vehicle_info: competitor.vehicle_info || '',
       plate: competitor.plate || '',
-      class_id: competitor.class_id
+      class_id: competitor.class_id,
+      email: competitor.email || ''
     });
     setEditOpen(true);
   };
@@ -1015,7 +1016,7 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
       toast.success('Competitor updated successfully');
       setEditOpen(false);
       setEditingCompetitor(null);
-      setFormData({ name: '', car_number: '', vehicle_info: '', plate: '', class_id: '' });
+      setFormData({ name: '', car_number: '', vehicle_info: '', plate: '', class_id: '', email: '' });
       onRefresh();
     } catch (error) {
       toast.error('Failed to update competitor');
