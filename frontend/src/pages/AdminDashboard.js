@@ -424,7 +424,7 @@ export default function AdminDashboard({ user, onLogout }) {
           </TabsContent>
 
           <TabsContent value="scores">
-            <ScoresPanel rounds={rounds} judges={judges} onRefresh={fetchAllData} />
+            <ScoresPanel rounds={rounds} judges={judges} competitors={competitors} pendingEmails={pendingEmails} onRefresh={() => { fetchAllData(); fetchPendingEmails(); }} />
           </TabsContent>
         </Tabs>
       </main>
