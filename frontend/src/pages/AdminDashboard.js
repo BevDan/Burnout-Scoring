@@ -1658,6 +1658,9 @@ function ScoresPanel({ rounds, judges, competitors, pendingEmails, onRefresh }) 
   const [emailDialog, setEmailDialog] = useState(null);
   const [emailAddress, setEmailAddress] = useState('');
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [bulkEmailDialog, setBulkEmailDialog] = useState(false);
+  const [bulkEmailData, setBulkEmailData] = useState([]);
+  const [sendingBulk, setSendingBulk] = useState(false);
 
   const fetchScores = async () => {
     setLoading(true);
