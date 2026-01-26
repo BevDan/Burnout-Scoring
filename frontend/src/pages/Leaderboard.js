@@ -342,7 +342,8 @@ export default function Leaderboard({ user }) {
               </div>
             ` : ''}
             <div class="header-text">
-              <div class="event-title">${reportTitle}</div>
+              <div class="event-title">${eventName}</div>
+              ${eventDate ? `<div class="event-date">${eventDate}</div>` : ''}
             </div>
             ${logo ? '<div class="header-spacer"></div>' : ''}
           </div>
