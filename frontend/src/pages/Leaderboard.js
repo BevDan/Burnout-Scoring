@@ -26,11 +26,16 @@ export default function Leaderboard({ user }) {
   const [scoreDisplay, setScoreDisplay] = useState('average'); // 'average' or 'total'
   const [leaderboardType, setLeaderboardType] = useState('round'); // 'round' or 'minor'
   const [showScoresOnPrint, setShowScoresOnPrint] = useState(true);
+  
+  // Logo and website settings for printing
+  const [logo, setLogo] = useState(null);
+  const [websiteSettings, setWebsiteSettings] = useState({ website_url: '', organization_name: '' });
 
   useEffect(() => {
     fetchRounds();
     fetchClasses();
     fetchEvents();
+    fetchSettings();
   }, []);
 
   useEffect(() => {
@@ -40,6 +45,19 @@ export default function Leaderboard({ user }) {
       fetchMinorRoundsLeaderboard();
     }
   }, [selectedRound, selectedClass, leaderboardType]);
+
+  const fetchSettings = async () => {
+    try {
+      const [logoRes, websiteRes] = await Promise.all([
+        axios.get(`${API}/admin/settings/logo`),
+        axios.get(`${API}/admin/settings/website`)
+      ]);
+      setLogo(logoRes.data.logo);
+      setWebsiteSettings(websiteRes.data);
+    } catch (error) {
+      // Settings might not exist yet
+    }
+  };
 
   const fetchRounds = async () => {
     try {
