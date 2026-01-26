@@ -94,7 +94,7 @@ Build a full-stack web application to score a burnout competition with:
 - [x] **Success indicator** - Green banner when no scoring issues
 - [x] **Refresh Errors button** - Re-check scoring issues on demand
 
-### Phase 7: Disqualification & Admin Score Editing (Complete - Current)
+### Phase 7: Disqualification & Admin Score Editing (Complete)
 - [x] **Disqualified penalty** - When toggled, final score becomes 0
 - [x] **Disqualified UI** - Prominent toggle button on Judge Scoring page with "YES - Score will be 0"
 - [x] **Final score display** - Shows "0 (DQ)" when disqualified
@@ -102,6 +102,17 @@ Build a full-stack web application to score a burnout competition with:
 - [x] **Admin Edit recalculates** - Updates score_subtotal, penalty_total, final_score including DQ logic
 - [x] **Email tracking field** - `email_sent` boolean on scores (defaults to false)
 - [x] **Pending emails count** - Orange indicator on dashboard showing competitors needing email
+
+### Phase 8: Email Function & Report Formatting (Complete - Current)
+- [x] **SMTP Configuration** - Settings dialog has Email Settings section with server, port, email, password, TLS
+- [x] **Test Connection button** - Validates SMTP credentials before saving
+- [x] **Score status display** - "Not emailed" / "✓ Emailed" status column in Scores tab
+- [x] **Email button per score** - Blue button opens Send Score Report dialog
+- [x] **Send email dialog** - Shows competitor info and email input
+- [x] **Comprehensive email report** - HTML email with all scoring categories, penalties, round-by-round breakdown
+- [x] **Auto-mark as emailed** - Scores automatically marked as `email_sent: true` after successful send
+- [x] **Date format fix** - DD/MM/YYYY format (Australian) in print reports
+- [x] **Print report layout** - Event name on line 1, date on line 2 (separate lines)
 
 ---
 
