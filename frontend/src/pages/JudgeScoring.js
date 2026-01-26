@@ -291,7 +291,7 @@ export default function JudgeScoring({ user, onLogout }) {
               </SelectTrigger>
               <SelectContent className="bg-[#18181b] border-[#27272a]">
                 {rounds.map((round) => (
-                  <SelectItem key={round.id} value={round.id}>{round.name} - {round.date}</SelectItem>
+                  <SelectItem key={round.id} value={round.id}>{round.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
