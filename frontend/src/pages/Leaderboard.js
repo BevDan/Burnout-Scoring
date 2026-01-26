@@ -174,73 +174,187 @@ export default function Leaderboard({ user }) {
   };
 
   const handlePrint = () => {
-    const printContent = printRef.current;
     const printWindow = window.open('', '_blank');
     
     const activeEvent = getActiveEvent();
     const roundName = leaderboardType === 'round' ? getSelectedRoundName() : 'Minor Rounds Cumulative';
     const className = selectedClass ? classes.find(c => c.id === selectedClass)?.name : 'All Classes';
+    const now = new Date();
+    const timestamp = now.toLocaleString('en-AU', { 
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hour12: true
+    });
+    
+    // Build title from event name and date
+    const reportTitle = activeEvent 
+      ? `${activeEvent.name} - ${activeEvent.date}`
+      : 'Burnout Competition';
     
     printWindow.document.write(`
       <html>
         <head>
-          <title>Leaderboard - ${roundName}</title>
+          <title>${reportTitle}</title>
           <style>
-            body { font-family: Arial, sans-serif; padding: 20px; }
-            .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
-            .event-name { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
-            .event-date { font-size: 14px; color: #666; margin-bottom: 10px; }
-            .round-name { font-size: 20px; font-weight: bold; margin-top: 15px; }
-            .class-name { font-size: 14px; color: #666; }
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-            th { background-color: #f5f5f5; font-weight: bold; }
-            .rank { text-align: center; font-weight: bold; }
-            .car-number { font-weight: bold; color: #f97316; }
-            .score { text-align: right; font-weight: bold; font-size: 18px; }
-            .rank-1 { background-color: #fff9e6; }
+            * { box-sizing: border-box; }
+            body { 
+              font-family: Arial, sans-serif; 
+              padding: 20px 40px; 
+              margin: 0;
+              color: #000;
+            }
+            
+            /* Header with logo */
+            .header {
+              display: flex;
+              align-items: flex-start;
+              margin-bottom: 20px;
+              padding-bottom: 15px;
+              border-bottom: 1px solid #ccc;
+            }
+            .logo-container {
+              flex-shrink: 0;
+              margin-right: 20px;
+            }
+            .logo {
+              max-height: 70px;
+              max-width: 200px;
+              object-fit: contain;
+            }
+            .header-text {
+              flex: 1;
+              text-align: center;
+            }
+            .event-title {
+              font-size: 22px;
+              font-weight: bold;
+              margin-bottom: 8px;
+            }
+            .header-spacer {
+              width: 200px;
+              flex-shrink: 0;
+            }
+            
+            /* Subtitle section */
+            .subtitle-row {
+              display: flex;
+              justify-content: flex-start;
+              gap: 40px;
+              margin-bottom: 15px;
+              font-size: 14px;
+            }
+            .subtitle-item {
+              display: flex;
+              gap: 8px;
+            }
+            .subtitle-label {
+              font-weight: bold;
+            }
+            
+            /* Table */
+            table { 
+              width: 100%; 
+              border-collapse: collapse; 
+              margin-top: 10px;
+              font-size: 13px;
+            }
+            th, td { 
+              border: 1px solid #000; 
+              padding: 8px 10px; 
+              text-align: left; 
+            }
+            th { 
+              background-color: #f0f0f0; 
+              font-weight: bold;
+              font-size: 12px;
+            }
+            .rank-col { 
+              width: 50px; 
+              text-align: center; 
+            }
+            .car-col { 
+              width: 80px; 
+              font-weight: bold;
+            }
+            .score-col { 
+              width: 80px; 
+              text-align: right; 
+              font-weight: bold;
+            }
+            
+            /* Top 3 highlighting */
+            .rank-1 { background-color: #fffde7; }
             .rank-2 { background-color: #f5f5f5; }
-            .rank-3 { background-color: #fdf4e8; }
+            .rank-3 { background-color: #fff3e0; }
+            
+            /* Footer */
+            .footer {
+              display: flex;
+              justify-content: space-between;
+              margin-top: 30px;
+              padding-top: 15px;
+              border-top: 1px solid #ccc;
+              font-size: 11px;
+              color: #666;
+            }
+            
             @media print {
-              body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              body { 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact; 
+              }
+              @page { margin: 1cm; }
             }
           </style>
         </head>
         <body>
           <div class="header">
-            ${activeEvent ? `
-              <div class="event-name">${activeEvent.name}</div>
-              <div class="event-date">${activeEvent.date}</div>
+            ${logo ? `
+              <div class="logo-container">
+                <img src="${logo}" alt="Logo" class="logo" />
+              </div>
             ` : ''}
-            <div class="round-name">${roundName}</div>
-            <div class="class-name">${className}</div>
+            <div class="header-text">
+              <div class="event-title">${reportTitle}</div>
+            </div>
+            ${logo ? '<div class="header-spacer"></div>' : ''}
           </div>
+          
+          <div class="subtitle-row">
+            <div class="subtitle-item">
+              <span class="subtitle-label">Burnout Class</span>
+              <span>${className}</span>
+            </div>
+            <div class="subtitle-item">
+              <span class="subtitle-label">For</span>
+              <span>${roundName}</span>
+            </div>
+          </div>
+          
           <table>
             <thead>
               <tr>
-                <th style="width: 60px;">Rank</th>
-                <th style="width: 80px;">Car #</th>
+                <th class="rank-col"></th>
+                <th class="car-col">Car Number</th>
                 <th>Competitor</th>
-                <th>Vehicle</th>
-                <th>Class</th>
-                ${showScoresOnPrint ? `<th style="width: 100px; text-align: right;">${scoreDisplay === 'total' ? 'Total' : 'Average'}</th>` : ''}
+                ${showScoresOnPrint ? `<th class="score-col">${scoreDisplay === 'total' ? 'Total' : 'Average'}</th>` : ''}
               </tr>
             </thead>
             <tbody>
               ${leaderboard.map((entry, index) => `
                 <tr class="${index < 3 ? `rank-${index + 1}` : ''}">
-                  <td class="rank">${index + 1}</td>
-                  <td class="car-number">#${entry.car_number}</td>
+                  <td class="rank-col">${index + 1}</td>
+                  <td class="car-col">${entry.car_number}</td>
                   <td>${entry.competitor_name}</td>
-                  <td>${entry.vehicle_info || '-'}</td>
-                  <td>${entry.class_name}</td>
-                  ${showScoresOnPrint ? `<td class="score">${scoreDisplay === 'total' ? entry.total_score : entry.average_score}</td>` : ''}
+                  ${showScoresOnPrint ? `<td class="score-col">${scoreDisplay === 'total' ? entry.total_score : entry.average_score}</td>` : ''}
                 </tr>
               `).join('')}
             </tbody>
           </table>
-          <div style="margin-top: 30px; text-align: center; font-size: 12px; color: #999;">
-            Generated on ${new Date().toLocaleString()}
+          
+          <div class="footer">
+            <span>${timestamp}</span>
+            <span>${websiteSettings.website_url || ''}</span>
           </div>
         </body>
       </html>
