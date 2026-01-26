@@ -202,15 +202,21 @@ export default function Leaderboard({ user }) {
       hour12: true
     });
     
-    // Build title from event name and date
-    const reportTitle = activeEvent 
-      ? `${activeEvent.name} - ${activeEvent.date}`
-      : 'Burnout Competition';
+    // Format event date as day-month-year
+    const formatEventDate = (dateStr) => {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return dateStr; // Return original if invalid
+      return date.toLocaleDateString('en-AU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    };
+    
+    const eventName = activeEvent?.name || 'Burnout Competition';
+    const eventDate = activeEvent?.date ? formatEventDate(activeEvent.date) : '';
     
     printWindow.document.write(`
       <html>
         <head>
-          <title>${reportTitle}</title>
+          <title>${eventName}</title>
           <style>
             * { box-sizing: border-box; }
             body { 
@@ -244,7 +250,12 @@ export default function Leaderboard({ user }) {
             .event-title {
               font-size: 22px;
               font-weight: bold;
-              margin-bottom: 8px;
+              margin-bottom: 4px;
+            }
+            .event-date {
+              font-size: 16px;
+              color: #555;
+              margin-bottom: 0;
             }
             .header-spacer {
               width: 200px;
