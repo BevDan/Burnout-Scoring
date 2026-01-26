@@ -646,6 +646,51 @@ async def update_score(score_id: str, score_update: ScoreUpdate, current_user: U
     
     return Score(**updated)
 
+# Admin Score Management
+@api_router.get("/admin/scores")
+async def get_all_scores(
+    round_id: Optional[str] = None,
+    judge_id: Optional[str] = None,
+    admin: User = Depends(require_admin)
+):
+    """Get all scores with optional filters"""
+    query = {}
+    if round_id:
+        query["round_id"] = round_id
+    if judge_id:
+        query["judge_id"] = judge_id
+    
+    scores = await db.scores.find(query, {"_id": 0}).to_list(10000)
+    
+    # Get related data
+    competitors = await db.competitors.find({}, {"_id": 0}).to_list(1000)
+    rounds = await db.rounds.find({}, {"_id": 0}).to_list(1000)
+    
+    competitors_dict = {c["id"]: c for c in competitors}
+    rounds_dict = {r["id"]: r for r in rounds}
+    
+    result = []
+    for score in scores:
+        comp = competitors_dict.get(score.get("competitor_id"), {})
+        round_data = rounds_dict.get(score.get("round_id"), {})
+        
+        result.append({
+            **score,
+            "competitor_name": comp.get("name", "Unknown"),
+            "car_number": comp.get("car_number", ""),
+            "round_name": round_data.get("name", "Unknown")
+        })
+    
+    return result
+
+@api_router.delete("/admin/scores/{score_id}")
+async def delete_score(score_id: str, admin: User = Depends(require_admin)):
+    """Delete a specific score"""
+    result = await db.scores.delete_one({"id": score_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Score not found")
+    return {"message": "Score deleted successfully"}
+
 # Leaderboard
 @api_router.get("/leaderboard/{round_id}", response_model=List[LeaderboardEntry])
 async def get_leaderboard(round_id: str, class_id: Optional[str] = None, current_user: User = Depends(get_current_user)):
