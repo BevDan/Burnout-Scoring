@@ -331,6 +331,33 @@ export default function AdminDashboard({ user, onLogout }) {
         </div>
       )}
 
+      {/* Pending Emails Indicator */}
+      {pendingEmails.competitors_pending_email > 0 && (
+        <div className="max-w-7xl mx-auto px-6 pt-4" data-testid="pending-emails-section">
+          <div className="bg-[#422006]/50 border border-[#f59e0b] rounded-lg p-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-[#f59e0b] rounded-full px-3 py-1">
+                <span className="ui-font text-lg font-bold text-black">{pendingEmails.competitors_pending_email}</span>
+              </div>
+              <p className="text-[#fbbf24] text-sm">
+                Competitor score{pendingEmails.competitors_pending_email !== 1 ? 's' : ''} ready to email 
+                <span className="text-[#a1a1aa] ml-1">
+                  ({pendingEmails.total_competitors_scored} total scored)
+                </span>
+              </p>
+            </div>
+            <Button 
+              onClick={fetchPendingEmails}
+              variant="outline"
+              size="sm"
+              className="border-[#f59e0b] text-[#f59e0b] hover:bg-[#f59e0b] hover:text-black"
+            >
+              Refresh
+            </Button>
+          </div>
+        </div>
+      )}
+
       <main className="max-w-7xl mx-auto px-6 py-8">
         <Tabs defaultValue="judges" className="space-y-6">
           <TabsList className="bg-[#18181b] border border-[#27272a] p-1">
@@ -343,7 +370,7 @@ export default function AdminDashboard({ user, onLogout }) {
           </TabsList>
 
           <TabsContent value="judges">
-            <JudgesPanel judges={judges} onRefresh={() => { fetchAllData(); fetchScoringErrors(); }} />
+            <JudgesPanel judges={judges} onRefresh={() => { fetchAllData(); fetchScoringErrors(); fetchPendingEmails(); }} />
           </TabsContent>
 
           <TabsContent value="classes">
