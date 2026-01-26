@@ -30,6 +30,7 @@ export default function JudgeScoring({ user, onLogout }) {
   const [showReview, setShowReview] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileData, setProfileData] = useState({ name: '', password: '' });
+  const [competitorSortBy, setCompetitorSortBy] = useState(localStorage.getItem('competitorSortBy') || 'number');
 
   const [scoreData, setScoreData] = useState({
     tip_in: 0,
