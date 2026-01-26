@@ -1402,6 +1402,350 @@ async def update_website_settings(
     )
     return {"message": "Settings updated successfully"}
 
+# SMTP Settings
+class SMTPSettings(BaseModel):
+    smtp_server: str = ""
+    smtp_port: int = 587
+    smtp_email: str = ""
+    smtp_password: str = ""
+    smtp_use_tls: bool = True
+
+@api_router.get("/admin/settings/smtp")
+async def get_smtp_settings(admin: User = Depends(require_admin)):
+    """Get SMTP settings (password masked)"""
+    settings = await db.settings.find_one({"key": "smtp"}, {"_id": 0})
+    if not settings:
+        return {"smtp_server": "", "smtp_port": 587, "smtp_email": "", "smtp_password": "", "smtp_use_tls": True}
+    # Mask password for security
+    return {
+        "smtp_server": settings.get("smtp_server", ""),
+        "smtp_port": settings.get("smtp_port", 587),
+        "smtp_email": settings.get("smtp_email", ""),
+        "smtp_password": "********" if settings.get("smtp_password") else "",
+        "smtp_use_tls": settings.get("smtp_use_tls", True)
+    }
+
+@api_router.put("/admin/settings/smtp")
+async def update_smtp_settings(settings: SMTPSettings, admin: User = Depends(require_admin)):
+    """Update SMTP settings"""
+    update_data = {
+        "key": "smtp",
+        "smtp_server": settings.smtp_server,
+        "smtp_port": settings.smtp_port,
+        "smtp_email": settings.smtp_email,
+        "smtp_use_tls": settings.smtp_use_tls,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    # Only update password if it's not masked
+    if settings.smtp_password and settings.smtp_password != "********":
+        update_data["smtp_password"] = settings.smtp_password
+    else:
+        # Keep existing password
+        existing = await db.settings.find_one({"key": "smtp"})
+        if existing and existing.get("smtp_password"):
+            update_data["smtp_password"] = existing["smtp_password"]
+    
+    await db.settings.update_one(
+        {"key": "smtp"},
+        {"$set": update_data},
+        upsert=True
+    )
+    return {"message": "SMTP settings updated successfully"}
+
+@api_router.post("/admin/settings/smtp/test")
+async def test_smtp_connection(admin: User = Depends(require_admin)):
+    """Test SMTP connection"""
+    settings = await db.settings.find_one({"key": "smtp"}, {"_id": 0})
+    if not settings or not settings.get("smtp_server"):
+        raise HTTPException(status_code=400, detail="SMTP not configured")
+    
+    try:
+        if settings.get("smtp_use_tls", True):
+            server = smtplib.SMTP(settings["smtp_server"], settings.get("smtp_port", 587))
+            server.starttls()
+        else:
+            server = smtplib.SMTP_SSL(settings["smtp_server"], settings.get("smtp_port", 465))
+        
+        server.login(settings["smtp_email"], settings["smtp_password"])
+        server.quit()
+        return {"message": "SMTP connection successful"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"SMTP connection failed: {str(e)}")
+
+class EmailRequest(BaseModel):
+    competitor_id: str
+    round_id: Optional[str] = None  # If None, send all rounds
+    recipient_email: str
+
+@api_router.post("/admin/send-competitor-report")
+async def send_competitor_report(request: EmailRequest, admin: User = Depends(require_admin)):
+    """Send score report email to a competitor"""
+    # Get SMTP settings
+    smtp_settings = await db.settings.find_one({"key": "smtp"}, {"_id": 0})
+    if not smtp_settings or not smtp_settings.get("smtp_server"):
+        raise HTTPException(status_code=400, detail="SMTP not configured")
+    
+    # Get competitor info
+    competitor = await db.competitors.find_one({"id": request.competitor_id}, {"_id": 0})
+    if not competitor:
+        raise HTTPException(status_code=404, detail="Competitor not found")
+    
+    # Get class info
+    comp_class = await db.classes.find_one({"id": competitor.get("class_id")}, {"_id": 0})
+    class_name = comp_class.get("name", "Unknown") if comp_class else "Unknown"
+    
+    # Get event info
+    event = await db.events.find_one({"is_active": {"$ne": False}}, {"_id": 0})
+    event_name = event.get("name", "Burnout Competition") if event else "Burnout Competition"
+    event_date = event.get("date", "") if event else ""
+    
+    # Format date as DD/MM/YYYY
+    if event_date:
+        try:
+            date_obj = datetime.fromisoformat(event_date.replace('Z', '+00:00')) if 'T' in event_date else datetime.strptime(event_date, '%Y-%m-%d')
+            event_date = date_obj.strftime('%d/%m/%Y')
+        except:
+            pass
+    
+    # Get website settings
+    website_settings = await db.settings.find_one({"key": "website"}, {"_id": 0})
+    website_url = website_settings.get("website_url", "") if website_settings else ""
+    org_name = website_settings.get("organization_name", "") if website_settings else ""
+    
+    # Get logo
+    logo_settings = await db.settings.find_one({"key": "logo"}, {"_id": 0})
+    logo_data = None
+    if logo_settings and logo_settings.get("data"):
+        logo_data = f"data:{logo_settings['content_type']};base64,{logo_settings['data']}"
+    
+    # Get scores for this competitor
+    score_filter = {"competitor_id": request.competitor_id}
+    if request.round_id:
+        score_filter["round_id"] = request.round_id
+    
+    scores = await db.scores.find(score_filter, {"_id": 0}).to_list(1000)
+    if not scores:
+        raise HTTPException(status_code=404, detail="No scores found for this competitor")
+    
+    # Get rounds info
+    rounds = await db.rounds.find({}, {"_id": 0}).to_list(100)
+    rounds_dict = {r["id"]: r for r in rounds}
+    
+    # Get judges info
+    judges = await db.users.find({"role": "judge"}, {"_id": 0}).to_list(100)
+    judges_dict = {j["id"]: j for j in judges}
+    
+    # Group scores by round
+    scores_by_round = {}
+    for score in scores:
+        round_id = score["round_id"]
+        if round_id not in scores_by_round:
+            scores_by_round[round_id] = []
+        scores_by_round[round_id].append(score)
+    
+    # Build HTML email
+    html_content = f"""
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; color: #333; max-width: 800px; margin: 0 auto; padding: 20px; }}
+            .header {{ text-align: center; border-bottom: 2px solid #f97316; padding-bottom: 15px; margin-bottom: 20px; }}
+            .header img {{ max-height: 60px; margin-bottom: 10px; }}
+            .event-name {{ font-size: 20px; font-weight: bold; margin-bottom: 5px; }}
+            .event-date {{ font-size: 14px; color: #666; }}
+            .competitor-info {{ background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; }}
+            .competitor-number {{ font-size: 24px; font-weight: bold; color: #f97316; }}
+            .round-section {{ margin-bottom: 25px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }}
+            .round-header {{ background: #f97316; color: white; padding: 10px 15px; font-weight: bold; }}
+            .score-table {{ width: 100%; border-collapse: collapse; }}
+            .score-table th, .score-table td {{ padding: 8px 12px; text-align: left; border-bottom: 1px solid #eee; }}
+            .score-table th {{ background: #f9f9f9; font-size: 12px; color: #666; }}
+            .category-row td {{ font-weight: 500; }}
+            .penalty-row td {{ color: #dc2626; }}
+            .total-row {{ background: #f0fdf4; }}
+            .total-row td {{ font-weight: bold; font-size: 16px; }}
+            .dq-row {{ background: #fef2f2; }}
+            .dq-row td {{ color: #dc2626; font-weight: bold; }}
+            .judge-name {{ font-size: 12px; color: #666; }}
+            .footer {{ text-align: center; margin-top: 30px; padding-top: 15px; border-top: 1px solid #ddd; font-size: 12px; color: #999; }}
+            .summary-box {{ background: #fff7ed; border: 2px solid #f97316; border-radius: 8px; padding: 15px; margin-top: 20px; text-align: center; }}
+            .summary-score {{ font-size: 32px; font-weight: bold; color: #f97316; }}
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            {f'<img src="{logo_data}" alt="Logo" /><br/>' if logo_data else ''}
+            <div class="event-name">{event_name}</div>
+            {f'<div class="event-date">{event_date}</div>' if event_date else ''}
+        </div>
+        
+        <div class="competitor-info">
+            <span class="competitor-number">#{competitor.get('car_number', '?')}</span>
+            <strong>{competitor.get('name', 'Unknown')}</strong><br/>
+            <span style="color: #666;">Vehicle: {competitor.get('vehicle_info', 'N/A')} | Class: {class_name}</span>
+        </div>
+    """
+    
+    total_scores = []
+    for round_id, round_scores in scores_by_round.items():
+        round_info = rounds_dict.get(round_id, {})
+        round_name = round_info.get("name", "Unknown Round")
+        
+        html_content += f"""
+        <div class="round-section">
+            <div class="round-header">{round_name}</div>
+            <table class="score-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+        """
+        
+        # Add judge columns
+        for score in round_scores:
+            judge = judges_dict.get(score["judge_id"], {})
+            html_content += f'<th class="judge-name">{judge.get("name", "Judge")}</th>'
+        
+        html_content += """
+                    </tr>
+                </thead>
+                <tbody>
+        """
+        
+        # Score categories
+        categories = [
+            ("Tip In", "tip_in", "0-10"),
+            ("Instant Smoke", "instant_smoke", "0-10"),
+            ("Constant Smoke", "constant_smoke", "0-20"),
+            ("Volume of Smoke", "volume_of_smoke", "0-20"),
+            ("Driving Skill", "driving_skill", "0-40"),
+            ("Tyres Popped", "tyres_popped", "×5 pts")
+        ]
+        
+        for cat_name, cat_key, cat_range in categories:
+            html_content += f'<tr class="category-row"><td>{cat_name} <span style="color:#999;font-size:11px;">({cat_range})</span></td>'
+            for score in round_scores:
+                val = score.get(cat_key, 0)
+                if cat_key == "tyres_popped":
+                    html_content += f'<td>{val} ({val * 5} pts)</td>'
+                else:
+                    html_content += f'<td>{val}</td>'
+            html_content += '</tr>'
+        
+        # Subtotal row
+        html_content += '<tr style="background:#f9f9f9;"><td><strong>Score Subtotal</strong></td>'
+        for score in round_scores:
+            html_content += f'<td><strong>{score.get("score_subtotal", 0)}</strong></td>'
+        html_content += '</tr>'
+        
+        # Penalties
+        penalties = [
+            ("Reversing", "penalty_reversing", -5),
+            ("Stopping", "penalty_stopping", -5),
+            ("Contact with Barrier", "penalty_contact_barrier", -5),
+            ("Small Fire", "penalty_small_fire", -5),
+            ("Failed to Drive Off", "penalty_failed_drive_off", -10),
+            ("Large Fire", "penalty_large_fire", -10)
+        ]
+        
+        html_content += '<tr><td colspan="100%" style="background:#fef2f2;padding:5px 12px;font-weight:bold;color:#dc2626;">Penalties</td></tr>'
+        
+        for pen_name, pen_key, pen_pts in penalties:
+            has_penalty = any(score.get(pen_key, 0) > 0 for score in round_scores)
+            if has_penalty:
+                html_content += f'<tr class="penalty-row"><td>{pen_name} ({pen_pts} pts)</td>'
+                for score in round_scores:
+                    val = score.get(pen_key, 0)
+                    if val > 0:
+                        html_content += f'<td>-{val * abs(pen_pts)}</td>'
+                    else:
+                        html_content += '<td>-</td>'
+                html_content += '</tr>'
+        
+        # Penalty total
+        html_content += '<tr style="background:#fef2f2;"><td><strong>Penalty Total</strong></td>'
+        for score in round_scores:
+            penalty_total = score.get("penalty_total", 0)
+            html_content += f'<td><strong>-{penalty_total}</strong></td>'
+        html_content += '</tr>'
+        
+        # Final score row
+        for score in round_scores:
+            is_dq = score.get("penalty_disqualified", False)
+            if is_dq:
+                html_content += '<tr class="dq-row"><td><strong>DISQUALIFIED</strong></td>'
+                for s in round_scores:
+                    if s.get("penalty_disqualified", False):
+                        html_content += '<td>0 (DQ)</td>'
+                    else:
+                        html_content += f'<td>{s.get("final_score", 0)}</td>'
+                html_content += '</tr>'
+                break
+        
+        html_content += '<tr class="total-row"><td>Final Score</td>'
+        for score in round_scores:
+            final = score.get("final_score", 0)
+            total_scores.append(final)
+            if score.get("penalty_disqualified", False):
+                html_content += '<td style="color:#dc2626;">0 (DQ)</td>'
+            else:
+                html_content += f'<td>{final}</td>'
+        html_content += '</tr>'
+        
+        html_content += """
+                </tbody>
+            </table>
+        </div>
+        """
+    
+    # Summary
+    if total_scores:
+        avg_score = sum(total_scores) / len(total_scores)
+        total_score = sum(total_scores)
+        html_content += f"""
+        <div class="summary-box">
+            <div>Total Score: <span class="summary-score">{total_score}</span></div>
+            <div style="color:#666;margin-top:5px;">Average Score: {avg_score:.2f} (from {len(scores_by_round)} round(s))</div>
+        </div>
+        """
+    
+    html_content += f"""
+        <div class="footer">
+            Generated on {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}<br/>
+            {website_url}
+        </div>
+    </body>
+    </html>
+    """
+    
+    # Send email
+    try:
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = f"Burnout Scores - #{competitor.get('car_number', '?')} {competitor.get('name', '')} - {event_name}"
+        msg['From'] = smtp_settings["smtp_email"]
+        msg['To'] = request.recipient_email
+        
+        msg.attach(MIMEText(html_content, 'html'))
+        
+        if smtp_settings.get("smtp_use_tls", True):
+            server = smtplib.SMTP(smtp_settings["smtp_server"], smtp_settings.get("smtp_port", 587))
+            server.starttls()
+        else:
+            server = smtplib.SMTP_SSL(smtp_settings["smtp_server"], smtp_settings.get("smtp_port", 465))
+        
+        server.login(smtp_settings["smtp_email"], smtp_settings["smtp_password"])
+        server.sendmail(smtp_settings["smtp_email"], request.recipient_email, msg.as_string())
+        server.quit()
+        
+        # Mark scores as emailed
+        await db.scores.update_many(
+            {"competitor_id": request.competitor_id} if not request.round_id else {"competitor_id": request.competitor_id, "round_id": request.round_id},
+            {"$set": {"email_sent": True}}
+        )
+        
+        return {"message": f"Email sent successfully to {request.recipient_email}"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
+
 app.include_router(api_router)
 
 app.add_middleware(
