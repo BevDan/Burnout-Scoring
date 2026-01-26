@@ -105,14 +105,18 @@ Build a full-stack web application to score a burnout competition with:
 
 ### Phase 8: Email Function & Report Formatting (Complete - Current)
 - [x] **SMTP Configuration** - Settings dialog has Email Settings section with server, port, email, password, TLS
-- [x] **Test Connection button** - Validates SMTP credentials before saving
+- [x] **Test Connection button** - Validates SMTP credentials with better error messages
+- [x] **Improved SMTP handling** - Proper timeout (30s), SSL vs STARTTLS auto-detection based on port
 - [x] **Score status display** - "Not emailed" / "✓ Emailed" status column in Scores tab
 - [x] **Email button per score** - Blue button opens Send Score Report dialog
 - [x] **Send email dialog** - Shows competitor info and email input
 - [x] **Comprehensive email report** - HTML email with all scoring categories, penalties, round-by-round breakdown
 - [x] **Auto-mark as emailed** - Scores automatically marked as `email_sent: true` after successful send
+- [x] **Bulk Email feature** - "Bulk Email" button to send to multiple competitors at once
+- [x] **Bulk Email dialog** - List of pending competitors with email inputs, select/deselect, batch send
 - [x] **Date format fix** - DD/MM/YYYY format (Australian) in print reports
 - [x] **Print report layout** - Event name on line 1, date on line 2 (separate lines)
+- [x] **Competitor email field** - Added email field to competitor model for storing emails
 
 ---
 
