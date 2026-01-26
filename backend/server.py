@@ -150,9 +150,11 @@ class Score(BaseModel):
     penalty_small_fire: int = 0  # count
     penalty_failed_drive_off: int = 0  # count
     penalty_large_fire: int = 0  # count
+    penalty_disqualified: bool = False  # If true, final score is 0
     score_subtotal: float = 0
     penalty_total: int = 0
     final_score: float = 0
+    email_sent: bool = False  # Track if score report was emailed
     submitted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     edited_at: Optional[datetime] = None
 
@@ -171,6 +173,7 @@ class ScoreCreate(BaseModel):
     penalty_small_fire: int = 0
     penalty_failed_drive_off: int = 0
     penalty_large_fire: int = 0
+    penalty_disqualified: bool = False
 
 class ScoreUpdate(BaseModel):
     tip_in: Optional[float] = None
@@ -185,6 +188,7 @@ class ScoreUpdate(BaseModel):
     penalty_small_fire: Optional[int] = None
     penalty_failed_drive_off: Optional[int] = None
     penalty_large_fire: Optional[int] = None
+    penalty_disqualified: Optional[bool] = None
 
 class ScoreWithDetails(BaseModel):
     id: str
@@ -207,9 +211,11 @@ class ScoreWithDetails(BaseModel):
     penalty_small_fire: int
     penalty_failed_drive_off: int
     penalty_large_fire: int
+    penalty_disqualified: bool = False
     score_subtotal: float
     penalty_total: int
     final_score: float
+    email_sent: bool = False
     submitted_at: datetime
     edited_at: Optional[datetime] = None
 
