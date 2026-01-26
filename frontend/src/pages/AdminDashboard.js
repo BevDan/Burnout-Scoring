@@ -1803,8 +1803,16 @@ function ScoresPanel({ rounds, judges, competitors, pendingEmails, onRefresh }) 
             </SelectContent>
           </Select>
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-4">
           <p className="text-sm text-[#a1a1aa]">{scores.length} scores found</p>
+          <Button
+            onClick={() => setBulkEmailDialog(true)}
+            className="bg-[#3b82f6] hover:bg-[#2563eb] text-white"
+            disabled={!pendingEmails?.competitors_list?.length}
+          >
+            <Send className="w-4 h-4 mr-2" />
+            Bulk Email ({pendingEmails?.competitors_pending_email || 0})
+          </Button>
         </div>
       </div>
 
