@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="8" skipped="0" tests="11" time="68.353" timestamp="2026-01-26T17:40:05.847099+00:00" hostname="agent-env-d9dbbe3b-3b0e-4450-b891-452bd58b6443"><testcase classname="backend.tests.test_bulk_email_all_rounds.TestBulkEmailAllRounds" name="test_pending_emails_shows_newly_completed_round" time="1.376"><failure message="AssertionError: Expected 1 pending entry for test competitor, got 0&#10;assert 0 == 1&#10; +  where 0 = len([])">backend/tests/test_bulk_email_all_rounds.py:190: in test_pending_emails_shows_newly_completed_round
+    assert len(test_pending) == 1, f"Expected 1 pending entry for test competitor, got {len(test_pending)}"
+E   AssertionError: Expected 1 pending entry for test competitor, got 0
+E   assert 0 == 1
+E    +  where 0 = len([])</failure></testcase><testcase classname="backend.tests.test_bulk_email_all_rounds.TestBulkEmailAllRounds" name="test_mark_round1_emailed_then_round2_appears" time="1.723"><failure message="AssertionError: Expected 1 pending entry (Round 2), got 0&#10;assert 0 == 1&#10; +  where 0 = len([])">backend/tests/test_bulk_email_all_rounds.py:221: in test_mark_round1_emailed_then_round2_appears
+    assert len(test_pending) == 1, f"Expected 1 pending entry (Round 2), got {len(test_pending)}"
+E   AssertionError: Expected 1 pending entry (Round 2), got 0
+E   assert 0 == 1
+E    +  where 0 = len([])</failure></testcase><testcase classname="backend.tests.test_bulk_email_all_rounds.TestBulkEmailAllRounds" name="test_bulk_email_marks_only_specific_round" time="1.618"><failure message="AssertionError: Expected 2 pending entries (both rounds), got 0&#10;assert 0 == 2&#10; +  where 0 = len([])">backend/tests/test_bulk_email_all_rounds.py:238: in test_bulk_email_marks_only_specific_round
+    assert len(test_pending) == 2, f"Expected 2 pending entries (both rounds), got {len(test_pending)}"
+E   AssertionError: Expected 2 pending entries (both rounds), got 0
+E   assert 0 == 2
+E    +  where 0 = len([])</failure></testcase><testcase classname="backend.tests.test_bulk_email_all_rounds.TestBulkEmailAllRounds" name="test_scores_email_sent_flag_per_round" time="1.763" /><testcase classname="backend.tests.test_bulk_email_all_rounds.TestGenerateEmailHtmlAllRounds" name="test_send_competitor_report_includes_all_rounds" time="1.463" /><testcase classname="backend.tests.test_bulk_email_all_rounds.TestGenerateEmailHtmlAllRounds" name="test_pending_emails_structure_includes_round_info" time="1.357"><failure message="AssertionError: Expected 2 pending entries, got 0&#10;assert 0 == 2&#10; +  where 0 = len([])">backend/tests/test_bulk_email_all_rounds.py:500: in test_pending_emails_structure_includes_round_info
+    assert len(test_pending) == 2, f"Expected 2 pending entries, got {len(test_pending)}"
+E   AssertionError: Expected 2 pending entries, got 0
+E   assert 0 == 2
+E    +  where 0 = len([])</failure></testcase><testcase classname="backend.tests.test_bulk_email_all_rounds.TestBulkEmailPayloadStructure" name="test_bulk_email_accepts_round_id_in_payload" time="0.458"><failure message="AssertionError: Unexpected status: 520&#10;assert 520 in [400, 500]&#10; +  where 520 = &lt;Response [520]&gt;.status_code">backend/tests/test_bulk_email_all_rounds.py:543: in test_bulk_email_accepts_round_id_in_payload
+    assert response.status_code in [400, 500], f"Unexpected status: {response.status_code}"
+E   AssertionError: Unexpected status: 520
+E   assert 520 in [400, 500]
+E    +  where 520 = &lt;Response [520]&gt;.status_code</failure></testcase><testcase classname="backend.tests.test_bulk_email_all_rounds.TestBulkEmailPayloadStructure" name="test_bulk_email_payload_without_round_id" time="0.445"><failure message="assert 520 in [400, 500]&#10; +  where 520 = &lt;Response [520]&gt;.status_code">backend/tests/test_bulk_email_all_rounds.py:563: in test_bulk_email_payload_without_round_id
+    assert response.status_code in [400, 500]
+E   assert 520 in [400, 500]
+E    +  where 520 = &lt;Response [520]&gt;.status_code</failure></testcase><testcase classname="backend.tests.test_bulk_email_all_rounds.TestCompletedRoundsHelper" name="test_round_not_complete_until_all_judges_score" time="1.631" /><testcase classname="backend.tests.test_bulk_email_all_rounds.TestCompletedRoundsHelper" name="test_round_complete_when_all_judges_score" time="53.246"><failure message="AssertionError: Expected 1 pending entry (complete round), got 0&#10;assert 0 == 1&#10; +  where 0 = len([])">backend/tests/test_bulk_email_all_rounds.py:750: in test_round_complete_when_all_judges_score
+    assert len(test_pending) == 1, f"Expected 1 pending entry (complete round), got {len(test_pending)}"
+E   AssertionError: Expected 1 pending entry (complete round), got 0
+E   assert 0 == 1
+E    +  where 0 = len([])</failure></testcase><testcase classname="backend.tests.test_bulk_email_all_rounds.TestCompletedRoundsHelper" name="test_multiple_completed_rounds_all_appear" time="3.111"><failure message="AssertionError: Expected 2 pending entries, got 0&#10;assert 0 == 2&#10; +  where 0 = len([])">backend/tests/test_bulk_email_all_rounds.py:776: in test_multiple_completed_rounds_all_appear
+    assert len(test_pending) == 2, f"Expected 2 pending entries, got {len(test_pending)}"
+E   AssertionError: Expected 2 pending entries, got 0
+E   assert 0 == 2
+E    +  where 0 = len([])</failure></testcase></testsuite></testsuites>
