@@ -929,12 +929,12 @@ function ScoreReviewDialog({ open, onOpenChange, scores, onScoreUpdated }) {
                 <>
                   <div className="grid grid-cols-2 md:grid-cols-6 gap-3 text-sm mb-3">
                     <div className="bg-[#18181b] p-2 rounded">
-                      <span className="text-[#a1a1aa] block text-xs">Tip In</span>
-                      <span className="data-font text-white font-bold">{score.tip_in || 0}</span>
-                    </div>
-                    <div className="bg-[#18181b] p-2 rounded">
                       <span className="text-[#a1a1aa] block text-xs">Instant Smoke</span>
                       <span className="data-font text-white font-bold">{score.instant_smoke}</span>
+                    </div>
+                    <div className="bg-[#18181b] p-2 rounded">
+                      <span className="text-[#a1a1aa] block text-xs">Tip In</span>
+                      <span className="data-font text-white font-bold">{score.tip_in || 0}</span>
                     </div>
                     <div className="bg-[#18181b] p-2 rounded">
                       <span className="text-[#a1a1aa] block text-xs">Constant</span>
