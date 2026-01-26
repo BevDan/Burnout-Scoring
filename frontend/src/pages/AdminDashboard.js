@@ -314,6 +314,90 @@ export default function AdminDashboard({ user, onLogout }) {
             </Button>
           </div>
 
+          {/* Report Settings Section */}
+          <div className="space-y-4 mt-6">
+            <h3 className="ui-font text-lg font-semibold text-white border-b border-[#27272a] pb-2 flex items-center gap-2">
+              <ImageIcon className="w-5 h-5 text-[#f97316]" />
+              Report Settings
+            </h3>
+            
+            {/* Logo Upload */}
+            <div className="bg-[#09090b] p-4 rounded border border-[#27272a]">
+              <p className="text-white font-semibold mb-2">Organization Logo</p>
+              <p className="text-xs text-[#a1a1aa] mb-3">This logo will appear on printed reports and email reports. Max 2MB.</p>
+              
+              {logo ? (
+                <div className="flex items-center gap-4">
+                  <img src={logo} alt="Logo" className="h-16 object-contain bg-white rounded p-2" />
+                  <Button 
+                    onClick={handleDeleteLogo} 
+                    variant="outline" 
+                    size="sm"
+                    className="border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
+                  >
+                    <X className="w-4 h-4 mr-1" />
+                    Remove
+                  </Button>
+                </div>
+              ) : (
+                <div>
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    onChange={handleLogoUpload}
+                    className="hidden"
+                    id="logo-upload"
+                  />
+                  <label htmlFor="logo-upload">
+                    <Button 
+                      asChild 
+                      className="btn-primary cursor-pointer"
+                      disabled={logoUploading}
+                    >
+                      <span>
+                        <Upload className="w-4 h-4 mr-2" />
+                        {logoUploading ? 'Uploading...' : 'Upload Logo'}
+                      </span>
+                    </Button>
+                  </label>
+                </div>
+              )}
+            </div>
+
+            {/* Website Settings */}
+            <div className="bg-[#09090b] p-4 rounded border border-[#27272a]">
+              <p className="text-white font-semibold mb-2 flex items-center gap-2">
+                <Globe className="w-4 h-4" />
+                Website & Organization
+              </p>
+              <p className="text-xs text-[#a1a1aa] mb-3">These details appear in the footer of printed reports.</p>
+              
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-xs">Organization Name</Label>
+                  <Input
+                    value={websiteSettings.organization_name}
+                    onChange={(e) => setWebsiteSettings({ ...websiteSettings, organization_name: e.target.value })}
+                    placeholder="e.g., Steel City Drags"
+                    className="bg-[#18181b] border-[#27272a] text-sm"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Website URL</Label>
+                  <Input
+                    value={websiteSettings.website_url}
+                    onChange={(e) => setWebsiteSettings({ ...websiteSettings, website_url: e.target.value })}
+                    placeholder="e.g., steelcitydrags.com"
+                    className="bg-[#18181b] border-[#27272a] text-sm"
+                  />
+                </div>
+                <Button onClick={handleWebsiteSettingsUpdate} size="sm" className="btn-primary">
+                  Save Settings
+                </Button>
+              </div>
+            </div>
+          </div>
+
           {/* Data Management Section */}
           <div className="space-y-4 mt-6">
             <h3 className="ui-font text-lg font-semibold text-white border-b border-[#27272a] pb-2 flex items-center gap-2">
