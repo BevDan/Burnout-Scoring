@@ -103,7 +103,7 @@ Build a full-stack web application to score a burnout competition with:
 - [x] **Email tracking field** - `email_sent` boolean on scores (defaults to false)
 - [x] **Pending emails count** - Orange indicator on dashboard showing competitors needing email
 
-### Phase 8: Email Function & Report Formatting (Complete - Current)
+### Phase 8: Email Function & Report Formatting (Complete)
 - [x] **SMTP Configuration** - Settings dialog has Email Settings section with server, port, email, password, TLS
 - [x] **Test Connection button** - Validates SMTP credentials with better error messages
 - [x] **Improved SMTP handling** - Proper timeout (30s), SSL vs STARTTLS auto-detection based on port
@@ -117,6 +117,13 @@ Build a full-stack web application to score a burnout competition with:
 - [x] **Date format fix** - DD/MM/YYYY format (Australian) in print reports
 - [x] **Print report layout** - Event name on line 1, date on line 2 (separate lines)
 - [x] **Competitor email field** - Added email field to competitor model for storing emails
+
+### Phase 9: Bulk Email Round Scoping Fix (Complete - January 26, 2026)
+- [x] **Round-scoped bulk emails** - Each email now sent for a specific round, not all rounds
+- [x] **Pending emails includes round_id** - Backend returns round_id for each pending email entry
+- [x] **Frontend sends round_id** - Bulk email dialog now includes round_id in the payload
+- [x] **Only specific round marked as sent** - Fixed bug where all rounds were marked as emailed
+- [x] **Partial scoring exclusion** - Competitor/round combos only appear in pending emails when ALL active judges have scored
 
 ---
 
