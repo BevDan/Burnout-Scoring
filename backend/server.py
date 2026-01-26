@@ -46,6 +46,7 @@ class User(BaseModel):
     username: str
     name: str
     role: str  # admin or judge
+    is_active: bool = True  # For judges - whether they're active for current event
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class UserCreate(BaseModel):
