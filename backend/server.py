@@ -91,6 +91,7 @@ class Competitor(BaseModel):
     vehicle_info: str
     plate: str
     class_id: str
+    email: Optional[str] = ""
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class CompetitorCreate(BaseModel):
