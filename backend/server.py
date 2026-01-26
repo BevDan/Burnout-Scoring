@@ -1997,15 +1997,19 @@ async def send_bulk_emails(request: BulkEmailRequest, admin: User = Depends(requ
         for item in request.competitor_emails:
             competitor_id = item.get("competitor_id")
             recipient_email = item.get("recipient_email")
-            round_id = item.get("round_id")  # Get round_id per competitor
+            round_id = item.get("round_id")  # The newly completed round that triggered this email
             
             if not competitor_id or not recipient_email:
                 results["failed"].append({"competitor_id": competitor_id, "error": "Missing data"})
                 continue
             
             try:
-                # Generate email content for specific round
-                email_data, error = await generate_competitor_email_html(competitor_id, round_id)
+                # Generate email content including ALL completed rounds for this competitor
+                email_data, error = await generate_competitor_email_html(
+                    competitor_id, 
+                    round_id=None,  # Don't filter by specific round
+                    include_all_completed=True  # Include all rounds where all judges have scored
+                )
                 if error:
                     results["failed"].append({"competitor_id": competitor_id, "error": error})
                     continue
@@ -2025,11 +2029,13 @@ async def send_bulk_emails(request: BulkEmailRequest, admin: User = Depends(requ
                 
                 server.sendmail(smtp_settings["smtp_email"], recipient_email, msg.as_string())
                 
-                # Mark scores as emailed for this round
-                score_filter = {"competitor_id": competitor_id}
+                # Mark only the newly completed round as emailed (not all rounds)
+                # This allows future completed rounds to trigger new emails
                 if round_id:
-                    score_filter["round_id"] = round_id
-                await db.scores.update_many(score_filter, {"$set": {"email_sent": True}})
+                    await db.scores.update_many(
+                        {"competitor_id": competitor_id, "round_id": round_id},
+                        {"$set": {"email_sent": True}}
+                    )
                 
                 results["sent"].append({"competitor_id": competitor_id, "email": recipient_email, "name": competitor.get("name")})
             except Exception as e:
