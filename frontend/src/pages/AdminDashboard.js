@@ -679,15 +679,15 @@ function JudgesPanel({ judges, onRefresh }) {
                 {/* Active Toggle */}
                 <button
                   onClick={() => handleToggleActive(judge.id)}
-                  className={`w-12 h-6 rounded-full transition-colors relative ${
+                  className={`w-11 h-6 rounded-full transition-colors relative flex-shrink-0 ${
                     isActive ? 'bg-[#22c55e]' : 'bg-[#3f3f46]'
                   }`}
                   title={isActive ? 'Active - click to deactivate' : 'Inactive - click to activate'}
                   data-testid={`toggle-judge-${judge.id}`}
                 >
                   <span 
-                    className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                      isActive ? 'translate-x-6' : 'translate-x-0.5'
+                    className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-all duration-200 ${
+                      isActive ? 'translate-x-5' : 'translate-x-0'
                     }`}
                   />
                 </button>
