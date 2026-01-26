@@ -565,6 +565,27 @@ export default function JudgeScoring({ user, onLogout }) {
               />
               <p className="text-xs text-[#a1a1aa] mt-1">Leave blank to keep current password</p>
             </div>
+            
+            {/* Competitor Sort Preference */}
+            <div className="border-t border-[#27272a] pt-4">
+              <Label>Sort Competitors By</Label>
+              <div className="flex gap-2 mt-2">
+                <Button
+                  onClick={() => handleSortChange('number')}
+                  className={`flex-1 ${competitorSortBy === 'number' ? 'btn-primary' : 'bg-[#27272a] hover:bg-[#3f3f46]'}`}
+                >
+                  Car Number
+                </Button>
+                <Button
+                  onClick={() => handleSortChange('name')}
+                  className={`flex-1 ${competitorSortBy === 'name' ? 'btn-primary' : 'bg-[#27272a] hover:bg-[#3f3f46]'}`}
+                >
+                  Name
+                </Button>
+              </div>
+              <p className="text-xs text-[#a1a1aa] mt-1">This preference is saved locally</p>
+            </div>
+            
             <Button onClick={handleProfileUpdate} className="w-full btn-primary">
               Update Profile
             </Button>
