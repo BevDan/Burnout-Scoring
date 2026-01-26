@@ -36,11 +36,15 @@ export default function AdminDashboard({ user, onLogout }) {
   
   // Scoring errors
   const [scoringErrors, setScoringErrors] = useState([]);
+  
+  // Pending emails
+  const [pendingEmails, setPendingEmails] = useState({ total_competitors_scored: 0, competitors_pending_email: 0, competitors_list: [] });
 
   useEffect(() => {
     fetchAllData();
     fetchSettings();
     fetchScoringErrors();
+    fetchPendingEmails();
   }, []);
 
   const fetchAllData = async () => {
