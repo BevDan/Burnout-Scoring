@@ -732,7 +732,11 @@ async def submit_score(request: Request, score_create: ScoreCreate, current_user
         (score_create.penalty_large_fire * 10)
     )
     
-    final_score = score_subtotal - penalty_total
+    # If disqualified, final score is 0
+    if score_create.penalty_disqualified:
+        final_score = 0
+    else:
+        final_score = max(0, score_subtotal - penalty_total)
     
     score = Score(
         judge_id=current_user.id,
