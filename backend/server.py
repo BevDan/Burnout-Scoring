@@ -818,7 +818,11 @@ async def update_score(score_id: str, score_update: ScoreUpdate, current_user: U
             (updated_score["penalty_large_fire"] * 10)
         )
         
-        final_score = score_subtotal - penalty_total
+        # If disqualified, final score is 0
+        if updated_score.get("penalty_disqualified", False):
+            final_score = 0
+        else:
+            final_score = max(0, score_subtotal - penalty_total)
         
         update_data["score_subtotal"] = score_subtotal
         update_data["penalty_total"] = penalty_total
