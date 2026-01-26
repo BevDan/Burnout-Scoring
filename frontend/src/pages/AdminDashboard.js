@@ -123,6 +123,15 @@ export default function AdminDashboard({ user, onLogout }) {
     }
   };
 
+  const fetchScoringErrors = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/scoring-errors`, getAuthHeaders());
+      setScoringErrors(response.data);
+    } catch (error) {
+      // Errors endpoint might not be critical
+    }
+  };
+
   const handleProfileUpdate = async () => {
     try {
       const updateData = {};
