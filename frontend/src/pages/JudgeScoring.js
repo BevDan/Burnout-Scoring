@@ -61,15 +61,34 @@ export default function JudgeScoring({ user, onLogout }) {
 
   useEffect(() => {
     // Filter competitors based on selected class
+    let filtered;
     if (selectedClass === 'all') {
-      setFilteredCompetitors(competitors);
+      filtered = [...competitors];
     } else {
-      setFilteredCompetitors(competitors.filter(c => c.class_id === selectedClass));
+      filtered = competitors.filter(c => c.class_id === selectedClass);
     }
+    
+    // Sort competitors based on preference
+    if (competitorSortBy === 'name') {
+      filtered.sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+      filtered.sort((a, b) => {
+        const numA = parseInt(a.car_number) || 0;
+        const numB = parseInt(b.car_number) || 0;
+        return numA - numB;
+      });
+    }
+    
+    setFilteredCompetitors(filtered);
     // Reset selected competitor and search when class changes
     setSelectedCompetitor(null);
     setCarNumberSearch('');
-  }, [selectedClass, competitors]);
+  }, [selectedClass, competitors, competitorSortBy]);
+
+  const handleSortChange = (sortBy) => {
+    setCompetitorSortBy(sortBy);
+    localStorage.setItem('competitorSortBy', sortBy);
+  };
 
   const fetchRounds = async () => {
     try {
