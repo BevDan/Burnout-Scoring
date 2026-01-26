@@ -336,6 +336,124 @@ async def delete_judge(judge_id: str, admin: User = Depends(require_admin)):
         raise HTTPException(status_code=404, detail="Judge not found")
     return {"message": "Judge deleted"}
 
+@api_router.put("/admin/judges/{judge_id}/toggle-active")
+async def toggle_judge_active(judge_id: str, admin: User = Depends(require_admin)):
+    """Toggle a judge's active status"""
+    judge = await db.users.find_one({"id": judge_id, "role": "judge"})
+    if not judge:
+        raise HTTPException(status_code=404, detail="Judge not found")
+    
+    new_status = not judge.get("is_active", True)
+    await db.users.update_one(
+        {"id": judge_id},
+        {"$set": {"is_active": new_status}}
+    )
+    return {"message": f"Judge {'activated' if new_status else 'deactivated'}", "is_active": new_status}
+
+class ScoringError(BaseModel):
+    round_id: str
+    round_name: str
+    competitor_id: str
+    competitor_name: str
+    car_number: str
+    error_type: str  # "missing_scores" or "duplicate_scores"
+    details: str
+    judge_count: int
+    expected_count: int
+
+@api_router.get("/admin/scoring-errors", response_model=List[ScoringError])
+async def get_scoring_errors(admin: User = Depends(require_admin)):
+    """Check for scoring errors: missing scores from active judges or duplicate scores"""
+    errors = []
+    
+    # Get active judges
+    active_judges = await db.users.find(
+        {"role": "judge", "is_active": {"$ne": False}},
+        {"_id": 0, "id": 1, "name": 1}
+    ).to_list(100)
+    active_judge_ids = [j["id"] for j in active_judges]
+    active_judge_count = len(active_judge_ids)
+    
+    if active_judge_count == 0:
+        return errors
+    
+    # Get all active rounds
+    rounds = await db.rounds.find({"round_status": "active"}, {"_id": 0}).to_list(100)
+    
+    # Get all competitors
+    competitors = await db.competitors.find({}, {"_id": 0}).to_list(10000)
+    competitor_map = {c["id"]: c for c in competitors}
+    
+    # Get all scores
+    all_scores = await db.scores.find({}, {"_id": 0}).to_list(100000)
+    
+    for round_data in rounds:
+        round_id = round_data["id"]
+        round_name = round_data.get("name", "Unknown Round")
+        
+        # Group scores by competitor for this round
+        round_scores = [s for s in all_scores if s["round_id"] == round_id]
+        
+        # Build a map: competitor_id -> list of judge_ids who scored them
+        competitor_judges = {}
+        for score in round_scores:
+            comp_id = score["competitor_id"]
+            judge_id = score["judge_id"]
+            if comp_id not in competitor_judges:
+                competitor_judges[comp_id] = []
+            competitor_judges[comp_id].append(judge_id)
+        
+        # Check each competitor that has at least one score in this round
+        for comp_id, judge_ids in competitor_judges.items():
+            competitor = competitor_map.get(comp_id)
+            if not competitor:
+                continue
+            
+            # Only count scores from active judges
+            active_judge_scores = [j for j in judge_ids if j in active_judge_ids]
+            unique_active_judges = set(active_judge_scores)
+            
+            # Check for missing scores (not all active judges have scored)
+            if len(unique_active_judges) < active_judge_count:
+                missing_count = active_judge_count - len(unique_active_judges)
+                errors.append(ScoringError(
+                    round_id=round_id,
+                    round_name=round_name,
+                    competitor_id=comp_id,
+                    competitor_name=competitor.get("name", "Unknown"),
+                    car_number=competitor.get("car_number", "?"),
+                    error_type="missing_scores",
+                    details=f"Missing {missing_count} score(s) from active judges",
+                    judge_count=len(unique_active_judges),
+                    expected_count=active_judge_count
+                ))
+            
+            # Check for duplicate scores (same judge scored same competitor twice in round)
+            if len(active_judge_scores) != len(unique_active_judges):
+                # Find which judges have duplicates
+                from collections import Counter
+                judge_counts = Counter(active_judge_scores)
+                duplicates = [jid for jid, count in judge_counts.items() if count > 1]
+                duplicate_names = []
+                for jid in duplicates:
+                    judge = next((j for j in active_judges if j["id"] == jid), None)
+                    if judge:
+                        duplicate_names.append(judge["name"])
+                
+                errors.append(ScoringError(
+                    round_id=round_id,
+                    round_name=round_name,
+                    competitor_id=comp_id,
+                    competitor_name=competitor.get("name", "Unknown"),
+                    car_number=competitor.get("car_number", "?"),
+                    error_type="duplicate_scores",
+                    details=f"Duplicate scores from: {', '.join(duplicate_names)}",
+                    judge_count=len(active_judge_scores),
+                    expected_count=active_judge_count
+                ))
+    
+    return errors
+
 # Admin - Class management
 @api_router.get("/admin/classes", response_model=List[CompetitionClass])
 async def get_classes(current_user: User = Depends(get_current_user)):
