@@ -1623,10 +1623,9 @@ async def send_competitor_report(request: EmailRequest, admin: User = Depends(re
                         <th>Category</th>
         """
         
-        # Add judge columns
-        for score in round_scores:
-            judge = judges_dict.get(score["judge_id"], {})
-            html_content += f'<th class="judge-name">{judge.get("name", "Judge")}</th>'
+        # Add judge columns - number them as Judge 1, Judge 2, etc.
+        for idx, score in enumerate(round_scores, start=1):
+            html_content += f'<th class="judge-name">Judge {idx}</th>'
         
         html_content += """
                     </tr>
