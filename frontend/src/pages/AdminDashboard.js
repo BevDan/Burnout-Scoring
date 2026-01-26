@@ -808,14 +808,14 @@ function RoundsPanel({ rounds, onRefresh }) {
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editingRound, setEditingRound] = useState(null);
-  const [formData, setFormData] = useState({ name: '', date: '', round_status: 'active' });
+  const [formData, setFormData] = useState({ name: '', is_minor: false, round_status: 'active' });
 
   const handleCreate = async () => {
     try {
       await axios.post(`${API}/admin/rounds`, formData, getAuthHeaders());
       toast.success('Round created successfully');
       setOpen(false);
-      setFormData({ name: '', date: '', round_status: 'active' });
+      setFormData({ name: '', is_minor: false, round_status: 'active' });
       onRefresh();
     } catch (error) {
       toast.error('Failed to create round');
@@ -824,7 +824,7 @@ function RoundsPanel({ rounds, onRefresh }) {
 
   const startEdit = (round) => {
     setEditingRound(round);
-    setFormData({ name: round.name, date: round.date, round_status: round.round_status || 'active' });
+    setFormData({ name: round.name, is_minor: round.is_minor || false, round_status: round.round_status || 'active' });
     setEditOpen(true);
   };
 
@@ -834,7 +834,7 @@ function RoundsPanel({ rounds, onRefresh }) {
       toast.success('Round updated successfully');
       setEditOpen(false);
       setEditingRound(null);
-      setFormData({ name: '', date: '', round_status: 'active' });
+      setFormData({ name: '', is_minor: false, round_status: 'active' });
       onRefresh();
     } catch (error) {
       toast.error('Failed to update round');
