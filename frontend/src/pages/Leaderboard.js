@@ -23,13 +23,29 @@ export default function Leaderboard({ user }) {
   const [selectedClass, setSelectedClass] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [scoreDisplay, setScoreDisplay] = useState('average'); // 'average' or 'total'
-  const [leaderboardType, setLeaderboardType] = useState('round'); // 'round' or 'minor'
-  const [showScoresOnPrint, setShowScoresOnPrint] = useState(true);
+  
+  // Load preferences from localStorage
+  const [scoreDisplay, setScoreDisplay] = useState(() => {
+    return localStorage.getItem('leaderboard_scoreDisplay') || 'average';
+  });
+  const [leaderboardType, setLeaderboardType] = useState('round');
+  const [showScoresOnPrint, setShowScoresOnPrint] = useState(() => {
+    const saved = localStorage.getItem('leaderboard_showScores');
+    return saved !== null ? saved === 'true' : true;
+  });
   
   // Logo and website settings for printing
   const [logo, setLogo] = useState(null);
   const [websiteSettings, setWebsiteSettings] = useState({ website_url: '', organization_name: '' });
+
+  // Save preferences to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('leaderboard_scoreDisplay', scoreDisplay);
+  }, [scoreDisplay]);
+
+  useEffect(() => {
+    localStorage.setItem('leaderboard_showScores', showScoresOnPrint.toString());
+  }, [showScoresOnPrint]);
 
   useEffect(() => {
     fetchRounds();
