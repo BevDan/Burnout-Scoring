@@ -2172,6 +2172,71 @@ function ScoresPanel({ rounds, judges, competitors, pendingEmails, onRefresh }) 
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk Email Dialog */}
+      <Dialog open={bulkEmailDialog} onOpenChange={setBulkEmailDialog}>
+        <DialogContent className="bg-[#18181b] border-[#27272a] text-white max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="ui-font text-xl flex items-center gap-2">
+              <Send className="w-5 h-5 text-[#3b82f6]" />
+              Bulk Email Score Reports
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto space-y-3 py-2">
+            <p className="text-sm text-[#a1a1aa]">
+              Enter email addresses for each competitor. Only selected competitors with valid emails will receive reports.
+            </p>
+            {bulkEmailData.map((item, idx) => (
+              <div key={idx} className="bg-[#09090b] p-3 rounded border border-[#27272a] flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={item.selected}
+                  onChange={(e) => {
+                    const updated = [...bulkEmailData];
+                    updated[idx].selected = e.target.checked;
+                    setBulkEmailData(updated);
+                  }}
+                  className="w-5 h-5 flex-shrink-0"
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-white font-semibold truncate">
+                    <span className="car-number-font text-[#f97316]">#{item.car_number}</span> {item.competitor_name}
+                  </p>
+                  <p className="text-xs text-[#a1a1aa]">{item.round_name}</p>
+                </div>
+                <Input
+                  type="email"
+                  value={item.email}
+                  onChange={(e) => {
+                    const updated = [...bulkEmailData];
+                    updated[idx].email = e.target.value;
+                    setBulkEmailData(updated);
+                  }}
+                  placeholder="email@example.com"
+                  className="bg-[#18181b] border-[#27272a] w-56"
+                />
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-between items-center pt-4 border-t border-[#27272a]">
+            <p className="text-sm text-[#a1a1aa]">
+              {bulkEmailData.filter(d => d.selected && d.email).length} / {bulkEmailData.length} ready to send
+            </p>
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={() => setBulkEmailDialog(false)} className="border-[#27272a]">
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSendBulkEmails} 
+                className="bg-[#3b82f6] hover:bg-[#2563eb] text-white"
+                disabled={sendingBulk || bulkEmailData.filter(d => d.selected && d.email).length === 0}
+              >
+                {sendingBulk ? 'Sending...' : `Send ${bulkEmailData.filter(d => d.selected && d.email).length} Emails`}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
