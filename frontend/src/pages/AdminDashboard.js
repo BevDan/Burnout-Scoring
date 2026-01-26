@@ -1647,7 +1647,7 @@ function RoundsPanel({ rounds, onRefresh }) {
 }
 
 
-function ScoresPanel({ rounds, judges, onRefresh }) {
+function ScoresPanel({ rounds, judges, competitors, pendingEmails, onRefresh }) {
   const [scores, setScores] = useState([]);
   const [filterRound, setFilterRound] = useState('all');
   const [filterJudge, setFilterJudge] = useState('all');
@@ -1655,6 +1655,9 @@ function ScoresPanel({ rounds, judges, onRefresh }) {
   const [loading, setLoading] = useState(false);
   const [editScore, setEditScore] = useState(null);
   const [editData, setEditData] = useState({});
+  const [emailDialog, setEmailDialog] = useState(null);
+  const [emailAddress, setEmailAddress] = useState('');
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   const fetchScores = async () => {
     setLoading(true);
@@ -1707,6 +1710,27 @@ function ScoresPanel({ rounds, judges, onRefresh }) {
       penalty_large_fire: score.penalty_large_fire || 0,
       penalty_disqualified: score.penalty_disqualified || false
     });
+  };
+
+  const handleSendEmail = async () => {
+    if (!emailAddress || !emailDialog) return;
+    setSendingEmail(true);
+    try {
+      await axios.post(`${API}/admin/send-competitor-report`, {
+        competitor_id: emailDialog.competitor_id,
+        round_id: emailDialog.round_id,
+        recipient_email: emailAddress
+      }, getAuthHeaders());
+      toast.success(`Email sent to ${emailAddress}`);
+      setEmailDialog(null);
+      setEmailAddress('');
+      fetchScores();
+      onRefresh();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to send email');
+    } finally {
+      setSendingEmail(false);
+    }
   };
 
   const handleSaveEdit = async () => {
