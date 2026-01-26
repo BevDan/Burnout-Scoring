@@ -554,6 +554,86 @@ export default function AdminDashboard({ user, onLogout }) {
             </div>
           </div>
 
+          {/* Email/SMTP Settings Section */}
+          <div className="space-y-4 mt-6">
+            <h3 className="ui-font text-lg font-semibold text-white border-b border-[#27272a] pb-2 flex items-center gap-2">
+              <Mail className="w-5 h-5 text-[#3b82f6]" />
+              Email Settings (SMTP)
+            </h3>
+            
+            <div className="bg-[#09090b] p-4 rounded border border-[#27272a]">
+              <p className="text-xs text-[#a1a1aa] mb-3">Configure SMTP server to send score reports to competitors via email.</p>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs">SMTP Server</Label>
+                  <Input
+                    value={smtpSettings.smtp_server}
+                    onChange={(e) => setSmtpSettings({ ...smtpSettings, smtp_server: e.target.value })}
+                    placeholder="e.g., smtp.gmail.com"
+                    className="bg-[#18181b] border-[#27272a] text-sm"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Port</Label>
+                  <Input
+                    type="number"
+                    value={smtpSettings.smtp_port}
+                    onChange={(e) => setSmtpSettings({ ...smtpSettings, smtp_port: parseInt(e.target.value) || 587 })}
+                    placeholder="587"
+                    className="bg-[#18181b] border-[#27272a] text-sm"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Email Address</Label>
+                  <Input
+                    type="email"
+                    value={smtpSettings.smtp_email}
+                    onChange={(e) => setSmtpSettings({ ...smtpSettings, smtp_email: e.target.value })}
+                    placeholder="your-email@example.com"
+                    className="bg-[#18181b] border-[#27272a] text-sm"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Password / App Password</Label>
+                  <Input
+                    type="password"
+                    value={smtpSettings.smtp_password}
+                    onChange={(e) => setSmtpSettings({ ...smtpSettings, smtp_password: e.target.value })}
+                    placeholder="••••••••"
+                    className="bg-[#18181b] border-[#27272a] text-sm"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2 mt-3">
+                <input
+                  type="checkbox"
+                  id="smtp-tls"
+                  checked={smtpSettings.smtp_use_tls}
+                  onChange={(e) => setSmtpSettings({ ...smtpSettings, smtp_use_tls: e.target.checked })}
+                  className="w-4 h-4"
+                />
+                <Label htmlFor="smtp-tls" className="text-xs">Use TLS (recommended for port 587)</Label>
+              </div>
+              
+              <div className="flex gap-2 mt-4">
+                <Button onClick={handleSmtpSettingsUpdate} size="sm" className="btn-primary">
+                  Save SMTP Settings
+                </Button>
+                <Button 
+                  onClick={handleTestSmtp} 
+                  size="sm" 
+                  variant="outline" 
+                  className="border-[#3b82f6] text-[#3b82f6] hover:bg-[#3b82f6] hover:text-white"
+                  disabled={smtpTesting || !smtpSettings.smtp_server}
+                >
+                  {smtpTesting ? 'Testing...' : 'Test Connection'}
+                </Button>
+              </div>
+            </div>
+          </div>
+
           {/* Data Management Section */}
           <div className="space-y-4 mt-6">
             <h3 className="ui-font text-lg font-semibold text-white border-b border-[#27272a] pb-2 flex items-center gap-2">
