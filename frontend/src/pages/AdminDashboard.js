@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { LogOut, Users, Trophy, Calendar, Flag, Upload, Download, Settings, Trash2, AlertTriangle } from 'lucide-react';
+import { LogOut, Users, Trophy, Calendar, Flag, Upload, Download, Settings, Trash2, AlertTriangle, ClipboardList } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
