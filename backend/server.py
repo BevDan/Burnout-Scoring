@@ -1038,16 +1038,6 @@ async def reset_full(admin: User = Depends(require_admin)):
         }
     )
 
-app.include_router(api_router)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 # Settings/Logo endpoints
 @api_router.post("/admin/settings/logo")
 async def upload_logo(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
@@ -1134,6 +1124,16 @@ async def update_website_settings(
         upsert=True
     )
     return {"message": "Settings updated successfully"}
+
+app.include_router(api_router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 logging.basicConfig(
     level=logging.INFO,
