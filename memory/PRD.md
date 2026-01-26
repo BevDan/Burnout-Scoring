@@ -1,0 +1,126 @@
+# Burnout Competition Scoring Application - PRD
+
+## Original Problem Statement
+Build a full-stack web application to score a burnout competition with:
+- Judge scoring interface with multiple scoring categories
+- Admin management for events, rounds, classes, competitors, and judges
+- Leaderboard and reporting functionality with printable reports
+- Email integration for sending reports to competitors (future)
+
+## Core Requirements
+
+### Authentication & Authorization
+- **Admin role**: Full access to manage all data, upload logo, configure settings
+- **Judge role**: Score competitors, view leaderboard
+- Credentials: Admin (admin/admin123)
+
+### Scoring Categories (0.5 increments except Tyres)
+1. Tip In: 0-10 points
+2. Instant Smoke: 0-10 points
+3. Constant Smoke: 0-20 points
+4. Volume of Smoke: 0-20 points
+5. Driving Skill: 0-40 points
+6. Tyres Popped: 0-2 (integer increments)
+
+### Penalties
+- **Cumulative (-5 each)**: Reversing, Stopping, Contact with Barrier, Small Fire
+- **One-time (-10)**: Failed to Drive Off Pad, Large Fire
+
+### Data Management
+- Events: Name, date, active status
+- Rounds: Name, status, is_minor checkbox (for cumulative scoring)
+- Classes: Competition categories
+- Competitors: Car number, name, vehicle info, plate, class
+- Bulk CSV import (by class name)
+
+### Leaderboard & Reporting
+- View by single round or cumulative minor rounds
+- Toggle between Average and Total score display
+- Filter by class
+- Print Report with:
+  - Organization logo (uploaded via settings)
+  - Event name and date
+  - Class and round info
+  - Ranked competitor list with scores
+  - Footer with timestamp and website
+
+---
+
+## What's Been Implemented (January 2026)
+
+### Phase 1: Core Features (Complete)
+- [x] User authentication (JWT-based)
+- [x] Admin dashboard with tabs: Judges, Classes, Competitors, Events, Rounds, Scores
+- [x] Judge scoring page with all categories
+- [x] Score submission and editing
+- [x] Leaderboard with rankings
+
+### Phase 2: Scoring Enhancements (Complete)
+- [x] 0.5-point increments for scoring categories
+- [x] Integer-only Tyres Popped
+- [x] "Tip In" category added
+- [x] One-time toggle for Failed Drive Off and Large Fire penalties
+- [x] Judges can edit their submitted scores
+
+### Phase 3: Admin Features (Complete)
+- [x] Admin can edit/delete competitors
+- [x] Admin can delete individual scores from Scores tab
+- [x] Data reset options (scores only, competition data, full reset)
+- [x] CSV import with class name support
+- [x] CSV export with Tip In score included
+
+### Phase 4: Events & Rounds Restructure (Complete)
+- [x] Events entity with name, date, active status
+- [x] Rounds simplified: name, status, is_minor checkbox
+- [x] Minor rounds cumulative leaderboard
+
+### Phase 5: Leaderboard & Reports (Complete - Current)
+- [x] Leaderboard Type toggle (Single Round / Minor Rounds Cumulative)
+- [x] Score Display toggle (Average / Total)
+- [x] Class filter on leaderboard
+- [x] Print Report button
+- [x] **Logo upload in Admin Settings**
+- [x] **Website & Organization settings**
+- [x] **Professional print layout matching PDF examples**
+- [x] Footer with timestamp and website URL
+
+---
+
+## Prioritized Backlog
+
+### P1: Email Integration (Future)
+- [ ] SMTP configuration in Admin Settings
+- [ ] Individual competitor report generation
+- [ ] Send report to competitor's email
+
+### P2: Code Refactoring
+- [ ] Break down AdminDashboard.js (monolithic)
+- [ ] Break down JudgeScoring.js (monolithic)
+- [ ] Break down server.py into modules (routes, models, services)
+
+### P3: Enhancements
+- [ ] Multi-event support (switch between events)
+- [ ] Historical data/archives
+- [ ] Judge assignment to specific classes
+
+---
+
+## Technical Stack
+- **Frontend**: React, Tailwind CSS, shadcn/ui
+- **Backend**: Python, FastAPI, Motor (async MongoDB)
+- **Database**: MongoDB
+- **Auth**: JWT tokens
+
+## Key Files
+- `/app/backend/server.py` - Main backend API
+- `/app/frontend/src/pages/AdminDashboard.js` - Admin control panel
+- `/app/frontend/src/pages/JudgeScoring.js` - Judge scoring interface
+- `/app/frontend/src/pages/Leaderboard.js` - Leaderboard with print
+- `/app/frontend/src/pages/Login.js` - Authentication
+
+## API Endpoints (Key)
+- `POST /api/auth/login` - Login
+- `GET/POST /api/admin/settings/logo` - Logo management
+- `GET/PUT /api/admin/settings/website` - Website settings
+- `GET /api/leaderboard/{round_id}` - Round leaderboard
+- `GET /api/leaderboard/minor-rounds/cumulative` - Minor rounds cumulative
