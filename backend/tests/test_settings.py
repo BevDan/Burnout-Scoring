@@ -49,10 +49,11 @@ class TestSettingsEndpoints:
         )
         
         files = {'file': ('test_logo.png', png_data, 'image/png')}
-        response = self.session.post(
+        # Don't use session headers for multipart - set auth header separately
+        response = requests.post(
             f"{BASE_URL}/api/admin/settings/logo",
             files=files,
-            headers=self.auth_headers
+            headers={"Authorization": f"Bearer {self.token}"}
         )
         
         assert response.status_code == 200, f"Logo upload failed: {response.text}"
@@ -67,11 +68,12 @@ class TestSettingsEndpoints:
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
         )
         files = {'file': ('test_logo.png', png_data, 'image/png')}
-        self.session.post(
+        upload_response = requests.post(
             f"{BASE_URL}/api/admin/settings/logo",
             files=files,
-            headers=self.auth_headers
+            headers={"Authorization": f"Bearer {self.token}"}
         )
+        assert upload_response.status_code == 200, f"Upload failed: {upload_response.text}"
         
         # Now get the logo
         response = self.session.get(f"{BASE_URL}/api/admin/settings/logo")
@@ -89,10 +91,10 @@ class TestSettingsEndpoints:
         )
         
         files = {'file': ('test_logo.jpg', jpeg_data, 'image/jpeg')}
-        response = self.session.post(
+        response = requests.post(
             f"{BASE_URL}/api/admin/settings/logo",
             files=files,
-            headers=self.auth_headers
+            headers={"Authorization": f"Bearer {self.token}"}
         )
         
         assert response.status_code == 200
@@ -103,10 +105,10 @@ class TestSettingsEndpoints:
         """Test POST /api/admin/settings/logo rejects invalid file types"""
         # Try to upload a text file
         files = {'file': ('test.txt', b'This is not an image', 'text/plain')}
-        response = self.session.post(
+        response = requests.post(
             f"{BASE_URL}/api/admin/settings/logo",
             files=files,
-            headers=self.auth_headers
+            headers={"Authorization": f"Bearer {self.token}"}
         )
         
         assert response.status_code == 400
@@ -120,10 +122,10 @@ class TestSettingsEndpoints:
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
         )
         files = {'file': ('test_logo.png', png_data, 'image/png')}
-        self.session.post(
+        requests.post(
             f"{BASE_URL}/api/admin/settings/logo",
             files=files,
-            headers=self.auth_headers
+            headers={"Authorization": f"Bearer {self.token}"}
         )
         
         # Delete the logo
