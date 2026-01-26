@@ -1781,8 +1781,45 @@ async def send_competitor_report(request: EmailRequest, admin: User = Depends(re
         raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
 
 # Helper function to create email HTML content
-async def generate_competitor_email_html(competitor_id: str, round_id: Optional[str] = None):
-    """Generate HTML email content for a competitor's scores"""
+async def get_completed_rounds_for_competitor(competitor_id: str):
+    """Get all round IDs where this competitor has complete scoring from all active judges"""
+    # Get active judges
+    active_judges = await db.users.find(
+        {"role": "judge", "is_active": {"$ne": False}},
+        {"_id": 0, "id": 1}
+    ).to_list(100)
+    active_judge_ids = [j["id"] for j in active_judges]
+    active_judge_count = len(active_judge_ids)
+    
+    if active_judge_count == 0:
+        return []
+    
+    # Get all scores for this competitor
+    scores = await db.scores.find({"competitor_id": competitor_id}, {"_id": 0}).to_list(1000)
+    
+    # Group by round and check if all active judges have scored
+    scores_by_round = {}
+    for score in scores:
+        rid = score["round_id"]
+        if rid not in scores_by_round:
+            scores_by_round[rid] = set()
+        if score["judge_id"] in active_judge_ids:
+            scores_by_round[rid].add(score["judge_id"])
+    
+    # Return round IDs where all active judges have scored
+    completed_rounds = [rid for rid, judges in scores_by_round.items() 
+                        if len(judges) >= active_judge_count]
+    return completed_rounds
+
+
+async def generate_competitor_email_html(competitor_id: str, round_id: Optional[str] = None, include_all_completed: bool = False):
+    """Generate HTML email content for a competitor's scores
+    
+    Args:
+        competitor_id: The competitor's ID
+        round_id: Specific round to include (if None and include_all_completed=False, includes all)
+        include_all_completed: If True, include all rounds where all active judges have scored
+    """
     # Get competitor info
     competitor = await db.competitors.find_one({"id": competitor_id}, {"_id": 0})
     if not competitor:
@@ -1815,12 +1852,24 @@ async def generate_competitor_email_html(competitor_id: str, round_id: Optional[
     if logo_settings and logo_settings.get("data"):
         logo_data = f"data:{logo_settings['content_type']};base64,{logo_settings['data']}"
     
-    # Get scores for this competitor
-    score_filter = {"competitor_id": competitor_id}
-    if round_id:
-        score_filter["round_id"] = round_id
+    # Determine which rounds to include
+    if include_all_completed:
+        # Get all completed rounds for this competitor
+        completed_round_ids = await get_completed_rounds_for_competitor(competitor_id)
+        if not completed_round_ids:
+            return None, "No completed rounds found"
+        # Get scores for all completed rounds
+        scores = await db.scores.find(
+            {"competitor_id": competitor_id, "round_id": {"$in": completed_round_ids}}, 
+            {"_id": 0}
+        ).to_list(1000)
+    else:
+        # Original behavior - specific round or all
+        score_filter = {"competitor_id": competitor_id}
+        if round_id:
+            score_filter["round_id"] = round_id
+        scores = await db.scores.find(score_filter, {"_id": 0}).to_list(1000)
     
-    scores = await db.scores.find(score_filter, {"_id": 0}).to_list(1000)
     if not scores:
         return None, "No scores found"
     
