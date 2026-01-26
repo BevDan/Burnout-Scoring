@@ -1460,15 +1460,30 @@ async def test_smtp_connection(admin: User = Depends(require_admin)):
         raise HTTPException(status_code=400, detail="SMTP not configured")
     
     try:
-        if settings.get("smtp_use_tls", True):
-            server = smtplib.SMTP(settings["smtp_server"], settings.get("smtp_port", 587))
-            server.starttls()
+        port = settings.get("smtp_port", 587)
+        use_tls = settings.get("smtp_use_tls", True)
+        
+        # For port 465, use SSL directly; for 587, use STARTTLS
+        if port == 465 or not use_tls:
+            server = smtplib.SMTP_SSL(settings["smtp_server"], port, timeout=30)
         else:
-            server = smtplib.SMTP_SSL(settings["smtp_server"], settings.get("smtp_port", 465))
+            server = smtplib.SMTP(settings["smtp_server"], port, timeout=30)
+            server.ehlo()
+            if use_tls:
+                server.starttls()
+                server.ehlo()
         
         server.login(settings["smtp_email"], settings["smtp_password"])
         server.quit()
         return {"message": "SMTP connection successful"}
+    except smtplib.SMTPAuthenticationError as e:
+        raise HTTPException(status_code=400, detail=f"Authentication failed: Check email/password. {str(e)}")
+    except smtplib.SMTPConnectError as e:
+        raise HTTPException(status_code=400, detail=f"Could not connect to server: {str(e)}")
+    except smtplib.SMTPServerDisconnected as e:
+        raise HTTPException(status_code=400, detail=f"Server disconnected: {str(e)}")
+    except TimeoutError:
+        raise HTTPException(status_code=400, detail="Connection timed out. Check server address and port.")
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"SMTP connection failed: {str(e)}")
 
@@ -1476,6 +1491,10 @@ class EmailRequest(BaseModel):
     competitor_id: str
     round_id: Optional[str] = None  # If None, send all rounds
     recipient_email: str
+
+class BulkEmailRequest(BaseModel):
+    competitor_emails: List[dict]  # List of {competitor_id, recipient_email}
+    round_id: Optional[str] = None
 
 @api_router.post("/admin/send-competitor-report")
 async def send_competitor_report(request: EmailRequest, admin: User = Depends(require_admin)):
