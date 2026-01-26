@@ -984,12 +984,18 @@ function RoundsPanel({ rounds, onRefresh }) {
             <div key={round.id} className="bg-[#18181b] p-4 rounded border border-[#27272a] flex justify-between items-center">
               <div>
                 <p className="ui-font text-lg font-semibold text-white">{round.name}</p>
-                <p className="text-sm text-[#a1a1aa]">{round.date}</p>
-                <span className={`inline-block mt-2 px-3 py-1 rounded text-xs font-bold ${
-                  (round.round_status || 'active') === 'active' ? 'bg-[#22c55e] text-black' : 'bg-[#71717a] text-white'
-                }`}>
-                  {(round.round_status || 'active').toUpperCase()}
-                </span>
+                <div className="flex gap-2 mt-2">
+                  <span className={`inline-block px-3 py-1 rounded text-xs font-bold ${
+                    (round.round_status || 'active') === 'active' ? 'bg-[#22c55e] text-black' : 'bg-[#71717a] text-white'
+                  }`}>
+                    {(round.round_status || 'active').toUpperCase()}
+                  </span>
+                  {round.is_minor && (
+                    <span className="inline-block px-3 py-1 rounded text-xs font-bold bg-[#8b5cf6] text-white">
+                      MINOR
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="flex gap-2">
                 <Button
