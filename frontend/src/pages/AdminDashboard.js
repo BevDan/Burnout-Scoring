@@ -34,6 +34,12 @@ export default function AdminDashboard({ user, onLogout }) {
   const [logoUploading, setLogoUploading] = useState(false);
   const [websiteSettings, setWebsiteSettings] = useState({ website_url: '', organization_name: '' });
   
+  // SMTP Settings
+  const [smtpSettings, setSmtpSettings] = useState({ 
+    smtp_server: '', smtp_port: 587, smtp_email: '', smtp_password: '', smtp_use_tls: true 
+  });
+  const [smtpTesting, setSmtpTesting] = useState(false);
+  
   // Scoring errors
   const [scoringErrors, setScoringErrors] = useState([]);
   
