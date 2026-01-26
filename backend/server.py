@@ -767,13 +767,13 @@ async def get_leaderboard(round_id: str, class_id: Optional[str] = None, current
     competitors_dict = {c["id"]: c for c in competitors}
     classes_dict = {c["id"]: c["name"] for c in classes}
     
-    # Calculate averages
+    # Calculate totals and averages
     competitor_scores = {}
     for score in scores:
         comp_id = score["competitor_id"]
         if comp_id not in competitor_scores:
             competitor_scores[comp_id] = []
-        competitor_scores[comp_id].append(score["final_score"])
+        competitor_scores[comp_id].append(score.get("final_score", 0))
     
     leaderboard = []
     for comp_id, score_list in competitor_scores.items():
@@ -783,22 +783,83 @@ async def get_leaderboard(round_id: str, class_id: Optional[str] = None, current
         competitor = competitors_dict[comp_id]
         
         # Filter by class if specified
-        if class_id and competitor["class_id"] != class_id:
+        if class_id and competitor.get("class_id") != class_id:
             continue
         
-        avg_score = sum(score_list) / len(score_list)
+        total_score = sum(score_list)
+        avg_score = total_score / len(score_list) if score_list else 0
         leaderboard.append(LeaderboardEntry(
             competitor_id=comp_id,
-            competitor_name=competitor["name"],
-            car_number=competitor["car_number"],
-            vehicle_info=competitor["vehicle_info"],
-            class_name=classes_dict.get(competitor["class_id"], "Unknown"),
+            competitor_name=competitor.get("name", "Unknown"),
+            car_number=competitor.get("car_number", ""),
+            vehicle_info=competitor.get("vehicle_info", ""),
+            class_name=classes_dict.get(competitor.get("class_id"), "Unknown"),
+            total_score=round(total_score, 2),
             average_score=round(avg_score, 2),
             score_count=len(score_list)
         ))
     
-    # Sort by average score descending
+    # Sort by average score descending (default)
     leaderboard.sort(key=lambda x: x.average_score, reverse=True)
+    return leaderboard
+
+@api_router.get("/leaderboard/minor-rounds/cumulative", response_model=List[MinorRoundsLeaderboardEntry])
+async def get_minor_rounds_leaderboard(class_id: Optional[str] = None, current_user: User = Depends(get_current_user)):
+    """Get cumulative leaderboard for all minor rounds"""
+    # Get all minor rounds
+    minor_rounds = await db.rounds.find({"is_minor": True}, {"_id": 0}).to_list(100)
+    minor_round_ids = [r["id"] for r in minor_rounds]
+    
+    if not minor_round_ids:
+        return []
+    
+    # Get all scores for minor rounds
+    scores = await db.scores.find({"round_id": {"$in": minor_round_ids}}, {"_id": 0}).to_list(10000)
+    
+    # Get competitors and classes
+    competitors = await db.competitors.find({}, {"_id": 0}).to_list(1000)
+    classes = await db.classes.find({}, {"_id": 0}).to_list(1000)
+    
+    competitors_dict = {c["id"]: c for c in competitors}
+    classes_dict = {c["id"]: c["name"] for c in classes}
+    
+    # Calculate cumulative scores
+    competitor_data = {}
+    for score in scores:
+        comp_id = score["competitor_id"]
+        round_id = score["round_id"]
+        if comp_id not in competitor_data:
+            competitor_data[comp_id] = {"scores": [], "rounds": set()}
+        competitor_data[comp_id]["scores"].append(score.get("final_score", 0))
+        competitor_data[comp_id]["rounds"].add(round_id)
+    
+    leaderboard = []
+    for comp_id, data in competitor_data.items():
+        if comp_id not in competitors_dict:
+            continue
+        
+        competitor = competitors_dict[comp_id]
+        
+        # Filter by class if specified
+        if class_id and competitor.get("class_id") != class_id:
+            continue
+        
+        total_score = sum(data["scores"])
+        avg_score = total_score / len(data["scores"]) if data["scores"] else 0
+        leaderboard.append(MinorRoundsLeaderboardEntry(
+            competitor_id=comp_id,
+            competitor_name=competitor.get("name", "Unknown"),
+            car_number=competitor.get("car_number", ""),
+            vehicle_info=competitor.get("vehicle_info", ""),
+            class_name=classes_dict.get(competitor.get("class_id"), "Unknown"),
+            total_score=round(total_score, 2),
+            average_score=round(avg_score, 2),
+            rounds_competed=len(data["rounds"]),
+            score_count=len(data["scores"])
+        ))
+    
+    # Sort by total score descending
+    leaderboard.sort(key=lambda x: x.total_score, reverse=True)
     return leaderboard
 
 # Export
