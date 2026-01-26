@@ -158,6 +158,27 @@ export default function AdminDashboard({ user, onLogout }) {
     }
   };
 
+  const handleSmtpSettingsUpdate = async () => {
+    try {
+      await axios.put(`${API}/admin/settings/smtp`, smtpSettings, getAuthHeaders());
+      toast.success('SMTP settings saved');
+    } catch (error) {
+      toast.error('Failed to save SMTP settings');
+    }
+  };
+
+  const handleTestSmtp = async () => {
+    setSmtpTesting(true);
+    try {
+      await axios.post(`${API}/admin/settings/smtp/test`, {}, getAuthHeaders());
+      toast.success('SMTP connection successful!');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'SMTP connection failed');
+    } finally {
+      setSmtpTesting(false);
+    }
+  };
+
   const handleProfileUpdate = async () => {
     try {
       const updateData = {};
