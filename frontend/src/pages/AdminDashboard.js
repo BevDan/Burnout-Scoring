@@ -804,6 +804,189 @@ function CompetitorsPanel({ competitors, classes, onRefresh }) {
   );
 }
 
+
+function EventsPanel({ events, onRefresh }) {
+  const [open, setOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState(null);
+  const [formData, setFormData] = useState({ name: '', date: '', is_active: true });
+
+  const handleCreate = async () => {
+    try {
+      await axios.post(`${API}/admin/events`, formData, getAuthHeaders());
+      toast.success('Event created successfully');
+      setOpen(false);
+      setFormData({ name: '', date: '', is_active: true });
+      onRefresh();
+    } catch (error) {
+      toast.error('Failed to create event');
+    }
+  };
+
+  const startEdit = (event) => {
+    setEditingEvent(event);
+    setFormData({ name: event.name, date: event.date, is_active: event.is_active !== false });
+    setEditOpen(true);
+  };
+
+  const handleEdit = async () => {
+    try {
+      await axios.put(`${API}/admin/events/${editingEvent.id}`, formData, getAuthHeaders());
+      toast.success('Event updated successfully');
+      setEditOpen(false);
+      setEditingEvent(null);
+      setFormData({ name: '', date: '', is_active: true });
+      onRefresh();
+    } catch (error) {
+      toast.error('Failed to update event');
+    }
+  };
+
+  const handleDelete = async (eventId) => {
+    if (!window.confirm('Delete this event?')) return;
+    try {
+      await axios.delete(`${API}/admin/events/${eventId}`, getAuthHeaders());
+      toast.success('Event deleted');
+      onRefresh();
+    } catch (error) {
+      toast.error('Failed to delete event');
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="ui-font text-2xl font-bold text-white">Events</h2>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button className="btn-primary">
+              <Flag className="w-4 h-4 mr-2" />
+              Add Event
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="bg-[#18181b] border-[#27272a] text-white">
+            <DialogHeader>
+              <DialogTitle className="ui-font text-xl">Create New Event</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Event Name</Label>
+                <Input
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="e.g., Summer Burnouts 2025"
+                  className="bg-[#09090b] border-[#27272a]"
+                />
+              </div>
+              <div>
+                <Label>Date</Label>
+                <Input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  className="bg-[#09090b] border-[#27272a]"
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="is_active"
+                  checked={formData.is_active}
+                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                  className="w-4 h-4 rounded border-[#27272a] bg-[#09090b]"
+                />
+                <Label htmlFor="is_active" className="cursor-pointer">Active Event</Label>
+              </div>
+              <Button onClick={handleCreate} className="w-full btn-primary">
+                Create Event
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="bg-[#18181b] border-[#27272a] text-white">
+          <DialogHeader>
+            <DialogTitle className="ui-font text-xl">Edit Event</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Event Name</Label>
+              <Input
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="bg-[#09090b] border-[#27272a]"
+              />
+            </div>
+            <div>
+              <Label>Date</Label>
+              <Input
+                type="date"
+                value={formData.date}
+                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                className="bg-[#09090b] border-[#27272a]"
+              />
+            </div>
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="edit_is_active"
+                checked={formData.is_active}
+                onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                className="w-4 h-4 rounded border-[#27272a] bg-[#09090b]"
+              />
+              <Label htmlFor="edit_is_active" className="cursor-pointer">Active Event</Label>
+            </div>
+            <Button onClick={handleEdit} className="w-full btn-primary">
+              Update Event
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <div className="space-y-3">
+        {events.length === 0 ? (
+          <div className="text-center py-12 bg-[#18181b] rounded border border-[#27272a]">
+            <Flag className="w-12 h-12 text-[#a1a1aa] mx-auto mb-3" />
+            <p className="text-[#a1a1aa]">No events created yet. Click "Add Event" to get started.</p>
+          </div>
+        ) : (
+          events.map((event) => (
+            <div key={event.id} className="bg-[#18181b] p-4 rounded border border-[#27272a] flex justify-between items-center">
+              <div>
+                <p className="ui-font text-lg font-semibold text-white">{event.name}</p>
+                <p className="text-sm text-[#a1a1aa]">{event.date}</p>
+                <span className={`inline-block mt-2 px-3 py-1 rounded text-xs font-bold ${
+                  event.is_active !== false ? 'bg-[#22c55e] text-black' : 'bg-[#71717a] text-white'
+                }`}>
+                  {event.is_active !== false ? 'ACTIVE' : 'INACTIVE'}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => startEdit(event)}
+                  className="bg-[#f59e0b] hover:bg-[#d97706]"
+                  size="sm"
+                >
+                  Edit
+                </Button>
+                <Button
+                  onClick={() => handleDelete(event.id)}
+                  variant="destructive"
+                  size="sm"
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
 function RoundsPanel({ rounds, onRefresh }) {
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
