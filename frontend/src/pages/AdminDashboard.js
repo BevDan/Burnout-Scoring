@@ -36,6 +36,7 @@ export default function AdminDashboard({ user, onLogout }) {
 
   useEffect(() => {
     fetchAllData();
+    fetchSettings();
   }, []);
 
   const fetchAllData = async () => {
@@ -54,6 +55,67 @@ export default function AdminDashboard({ user, onLogout }) {
       setEvents(eventsRes.data);
     } catch (error) {
       toast.error('Failed to load data');
+    }
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const [logoRes, websiteRes] = await Promise.all([
+        axios.get(`${API}/admin/settings/logo`),
+        axios.get(`${API}/admin/settings/website`)
+      ]);
+      setLogo(logoRes.data.logo);
+      setWebsiteSettings(websiteRes.data);
+    } catch (error) {
+      // Settings might not exist yet
+    }
+  };
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    setLogoUploading(true);
+    try {
+      await axios.post(`${API}/admin/settings/logo`, formData, {
+        ...getAuthHeaders(),
+        headers: {
+          ...getAuthHeaders().headers,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      toast.success('Logo uploaded successfully');
+      fetchSettings();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to upload logo');
+    } finally {
+      setLogoUploading(false);
+    }
+  };
+
+  const handleDeleteLogo = async () => {
+    try {
+      await axios.delete(`${API}/admin/settings/logo`, getAuthHeaders());
+      setLogo(null);
+      toast.success('Logo deleted');
+    } catch (error) {
+      toast.error('Failed to delete logo');
+    }
+  };
+
+  const handleWebsiteSettingsUpdate = async () => {
+    try {
+      await axios.put(
+        `${API}/admin/settings/website?website_url=${encodeURIComponent(websiteSettings.website_url)}&organization_name=${encodeURIComponent(websiteSettings.organization_name)}`,
+        {},
+        getAuthHeaders()
+      );
+      toast.success('Website settings updated');
+    } catch (error) {
+      toast.error('Failed to update website settings');
     }
   };
 
