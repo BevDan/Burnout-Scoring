@@ -476,6 +476,44 @@ async def delete_competitor(competitor_id: str, admin: User = Depends(require_ad
         raise HTTPException(status_code=404, detail="Competitor not found")
     return {"message": "Competitor deleted"}
 
+# Admin - Event management
+@api_router.get("/admin/events", response_model=List[Event])
+async def get_events(current_user: User = Depends(get_current_user)):
+    events = await db.events.find({}, {"_id": 0}).to_list(1000)
+    for evt in events:
+        if isinstance(evt.get('created_at'), str):
+            evt['created_at'] = datetime.fromisoformat(evt['created_at'])
+    return events
+
+@api_router.post("/admin/events", response_model=Event)
+async def create_event(event_create: EventCreate, admin: User = Depends(require_admin)):
+    event_obj = Event(**event_create.model_dump())
+    doc = event_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
+    await db.events.insert_one(doc)
+    return event_obj
+
+@api_router.put("/admin/events/{event_id}", response_model=Event)
+async def update_event(event_id: str, event_update: EventCreate, admin: User = Depends(require_admin)):
+    result = await db.events.update_one(
+        {"id": event_id},
+        {"$set": event_update.model_dump()}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    updated = await db.events.find_one({"id": event_id}, {"_id": 0})
+    if isinstance(updated.get('created_at'), str):
+        updated['created_at'] = datetime.fromisoformat(updated['created_at'])
+    return Event(**updated)
+
+@api_router.delete("/admin/events/{event_id}")
+async def delete_event(event_id: str, admin: User = Depends(require_admin)):
+    result = await db.events.delete_one({"id": event_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return {"message": "Event deleted"}
+
 # Admin - Round management
 @api_router.get("/admin/rounds", response_model=List[Round])
 async def get_rounds(current_user: User = Depends(get_current_user)):
