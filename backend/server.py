@@ -888,6 +888,145 @@ async def delete_score(score_id: str, admin: User = Depends(require_admin)):
         raise HTTPException(status_code=404, detail="Score not found")
     return {"message": "Score deleted successfully"}
 
+@api_router.put("/admin/scores/{score_id}")
+async def admin_edit_score(score_id: str, score_update: ScoreUpdate, admin: User = Depends(require_admin)):
+    """Admin endpoint to edit any score"""
+    existing_score = await db.scores.find_one({"id": score_id}, {"_id": 0})
+    if not existing_score:
+        raise HTTPException(status_code=404, detail="Score not found")
+    
+    # Update only provided fields
+    update_data = {k: v for k, v in score_update.model_dump().items() if v is not None}
+    
+    if update_data:
+        # Recalculate scores with updated values
+        updated_score = {**existing_score, **update_data}
+        
+        score_subtotal = (
+            updated_score.get("tip_in", 0) +
+            updated_score.get("instant_smoke", 0) +
+            updated_score.get("constant_smoke", 0) +
+            updated_score.get("volume_of_smoke", 0) +
+            updated_score.get("driving_skill", 0) +
+            (updated_score.get("tyres_popped", 0) * 5)
+        )
+        
+        penalty_total = (
+            (updated_score.get("penalty_reversing", 0) * 5) +
+            (updated_score.get("penalty_stopping", 0) * 5) +
+            (updated_score.get("penalty_contact_barrier", 0) * 5) +
+            (updated_score.get("penalty_small_fire", 0) * 5) +
+            (updated_score.get("penalty_failed_drive_off", 0) * 10) +
+            (updated_score.get("penalty_large_fire", 0) * 10)
+        )
+        
+        # If disqualified, final score is 0
+        if updated_score.get("penalty_disqualified", False):
+            final_score = 0
+        else:
+            final_score = max(0, score_subtotal - penalty_total)
+        
+        update_data["score_subtotal"] = score_subtotal
+        update_data["penalty_total"] = penalty_total
+        update_data["final_score"] = final_score
+        update_data["edited_at"] = datetime.now(timezone.utc).isoformat()
+        
+        await db.scores.update_one(
+            {"id": score_id},
+            {"$set": update_data}
+        )
+    
+    # Return updated score
+    updated = await db.scores.find_one({"id": score_id}, {"_id": 0})
+    return updated
+
+class PendingEmailStats(BaseModel):
+    total_competitors_scored: int
+    competitors_pending_email: int
+    competitors_list: List[dict]
+
+@api_router.get("/admin/pending-emails", response_model=PendingEmailStats)
+async def get_pending_emails(admin: User = Depends(require_admin)):
+    """Get count of competitors who have been scored but not emailed"""
+    # Get active judges count
+    active_judges = await db.users.find(
+        {"role": "judge", "is_active": {"$ne": False}},
+        {"_id": 0, "id": 1}
+    ).to_list(100)
+    active_judge_count = len(active_judges)
+    
+    if active_judge_count == 0:
+        return PendingEmailStats(
+            total_competitors_scored=0,
+            competitors_pending_email=0,
+            competitors_list=[]
+        )
+    
+    # Get all scores
+    scores = await db.scores.find({}, {"_id": 0}).to_list(100000)
+    
+    # Get competitors and rounds
+    competitors = await db.competitors.find({}, {"_id": 0}).to_list(10000)
+    rounds = await db.rounds.find({}, {"_id": 0}).to_list(100)
+    
+    competitors_dict = {c["id"]: c for c in competitors}
+    rounds_dict = {r["id"]: r for r in rounds}
+    
+    # Group scores by competitor and round
+    competitor_round_scores = {}
+    for score in scores:
+        comp_id = score["competitor_id"]
+        round_id = score["round_id"]
+        key = (comp_id, round_id)
+        if key not in competitor_round_scores:
+            competitor_round_scores[key] = {
+                "scores": [],
+                "email_sent": False
+            }
+        competitor_round_scores[key]["scores"].append(score)
+        # If any score in this round has been emailed, mark as sent
+        if score.get("email_sent", False):
+            competitor_round_scores[key]["email_sent"] = True
+    
+    # Find competitors with complete scoring (all active judges) but not emailed
+    pending_list = []
+    total_scored = 0
+    
+    for (comp_id, round_id), data in competitor_round_scores.items():
+        active_judge_ids = [j["id"] for j in active_judges]
+        scores_from_active = [s for s in data["scores"] if s["judge_id"] in active_judge_ids]
+        unique_judges = set(s["judge_id"] for s in scores_from_active)
+        
+        # Check if all active judges have scored
+        if len(unique_judges) >= active_judge_count:
+            total_scored += 1
+            if not data["email_sent"]:
+                competitor = competitors_dict.get(comp_id, {})
+                round_info = rounds_dict.get(round_id, {})
+                pending_list.append({
+                    "competitor_id": comp_id,
+                    "competitor_name": competitor.get("name", "Unknown"),
+                    "car_number": competitor.get("car_number", "?"),
+                    "round_id": round_id,
+                    "round_name": round_info.get("name", "Unknown Round"),
+                    "score_count": len(scores_from_active)
+                })
+    
+    return PendingEmailStats(
+        total_competitors_scored=total_scored,
+        competitors_pending_email=len(pending_list),
+        competitors_list=pending_list
+    )
+
+@api_router.post("/admin/mark-emailed/{competitor_id}/{round_id}")
+async def mark_scores_emailed(competitor_id: str, round_id: str, admin: User = Depends(require_admin)):
+    """Mark all scores for a competitor in a round as emailed"""
+    result = await db.scores.update_many(
+        {"competitor_id": competitor_id, "round_id": round_id},
+        {"$set": {"email_sent": True}}
+    )
+    return {"message": f"Marked {result.modified_count} scores as emailed"}
+
 # Leaderboard
 @api_router.get("/leaderboard/{round_id}", response_model=List[LeaderboardEntry])
 async def get_leaderboard(round_id: str, class_id: Optional[str] = None, current_user: User = Depends(get_current_user)):
