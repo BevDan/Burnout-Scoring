@@ -136,6 +136,15 @@ export default function AdminDashboard({ user, onLogout }) {
     }
   };
 
+  const fetchPendingEmails = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/pending-emails`, getAuthHeaders());
+      setPendingEmails(response.data);
+    } catch (error) {
+      // Pending emails endpoint might not be critical
+    }
+  };
+
   const handleProfileUpdate = async () => {
     try {
       const updateData = {};
