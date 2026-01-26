@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { LogOut, Users, Trophy, Calendar, Flag, Upload, Download, Settings, Trash2, AlertTriangle, ClipboardList, ImageIcon, Globe, X } from 'lucide-react';
+import { LogOut, Users, Trophy, Calendar, Flag, Upload, Download, Settings, Trash2, AlertTriangle, ClipboardList, ImageIcon, Globe, X, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -33,10 +33,14 @@ export default function AdminDashboard({ user, onLogout }) {
   const [logo, setLogo] = useState(null);
   const [logoUploading, setLogoUploading] = useState(false);
   const [websiteSettings, setWebsiteSettings] = useState({ website_url: '', organization_name: '' });
+  
+  // Scoring errors
+  const [scoringErrors, setScoringErrors] = useState([]);
 
   useEffect(() => {
     fetchAllData();
     fetchSettings();
+    fetchScoringErrors();
   }, []);
 
   const fetchAllData = async () => {
