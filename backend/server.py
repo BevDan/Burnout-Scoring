@@ -1747,7 +1747,10 @@ async def send_competitor_report(request: EmailRequest, admin: User = Depends(re
         msg['From'] = smtp_settings["smtp_email"]
         msg['To'] = request.recipient_email
         
-        msg.attach(MIMEText(html_content, 'html'))
+        # Use base64 encoding to avoid line length issues
+        html_part = MIMEText(html_content, 'html', 'utf-8')
+        html_part.replace_header('Content-Transfer-Encoding', 'base64')
+        msg.attach(html_part)
         
         port = smtp_settings.get("smtp_port", 587)
         use_tls = smtp_settings.get("smtp_use_tls", True)
