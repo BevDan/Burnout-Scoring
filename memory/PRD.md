@@ -86,6 +86,14 @@ Build a full-stack web application to score a burnout competition with:
 - [x] **Settings persistence (Score Display, Show Scores) via localStorage**
 - [x] **Logo properly displays in print preview (waits for image load)**
 
+### Phase 6: Judge Management & Scoring Validation (Complete - Current)
+- [x] **Active/Inactive toggle for judges** - Flexible judge count per event (2-4 judges)
+- [x] **Active judge count display** - Shown in header and Judges panel
+- [x] **Scoring error detection** - Missing scores and duplicate scores
+- [x] **Error alerts on Admin Dashboard** - Red alert with details when issues exist
+- [x] **Success indicator** - Green banner when no scoring issues
+- [x] **Refresh Errors button** - Re-check scoring issues on demand
+
 ---
 
 ## Prioritized Backlog
