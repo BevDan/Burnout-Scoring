@@ -2066,6 +2066,52 @@ function ScoresPanel({ rounds, judges, competitors, pendingEmails, onRefresh }) 
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Send Email Dialog */}
+      <Dialog open={!!emailDialog} onOpenChange={() => setEmailDialog(null)}>
+        <DialogContent className="bg-[#18181b] border-[#27272a] text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="ui-font text-xl flex items-center gap-2">
+              <Mail className="w-5 h-5 text-[#3b82f6]" />
+              Send Score Report
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="bg-[#09090b] p-3 rounded border border-[#27272a]">
+              <p className="text-white font-semibold">
+                <span className="car-number-font text-[#f97316]">#{emailDialog?.car_number}</span> {emailDialog?.competitor_name}
+              </p>
+              <p className="text-xs text-[#a1a1aa] mt-1">
+                This will send a detailed score report including all rounds and scoring categories.
+              </p>
+            </div>
+            
+            <div>
+              <Label className="text-sm">Recipient Email Address</Label>
+              <Input
+                type="email"
+                value={emailAddress}
+                onChange={(e) => setEmailAddress(e.target.value)}
+                placeholder="competitor@email.com"
+                className="bg-[#09090b] border-[#27272a] mt-1"
+              />
+            </div>
+            
+            <div className="flex justify-end gap-3 pt-2">
+              <Button variant="outline" onClick={() => setEmailDialog(null)} className="border-[#27272a]">
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSendEmail} 
+                className="bg-[#3b82f6] hover:bg-[#2563eb] text-white"
+                disabled={sendingEmail || !emailAddress}
+              >
+                {sendingEmail ? 'Sending...' : 'Send Email'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
