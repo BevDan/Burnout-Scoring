@@ -108,6 +108,7 @@ class CompetitorWithClass(BaseModel):
     plate: Optional[str] = ""
     class_id: str
     class_name: str
+    email: Optional[str] = ""  # Competitor's email for score reports
     created_at: datetime
 
 class Event(BaseModel):
