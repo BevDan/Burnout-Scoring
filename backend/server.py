@@ -1960,7 +1960,11 @@ async def send_bulk_emails(request: BulkEmailRequest, admin: User = Depends(requ
                 msg['Subject'] = f"Burnout Scores - #{competitor.get('car_number', '?')} {competitor.get('name', '')} - {event_name}"
                 msg['From'] = smtp_settings["smtp_email"]
                 msg['To'] = recipient_email
-                msg.attach(MIMEText(email_data["html"], 'html'))
+                
+                # Use base64 encoding to avoid line length issues
+                html_part = MIMEText(email_data["html"], 'html', 'utf-8')
+                html_part.replace_header('Content-Transfer-Encoding', 'base64')
+                msg.attach(html_part)
                 
                 server.sendmail(smtp_settings["smtp_email"], recipient_email, msg.as_string())
                 
