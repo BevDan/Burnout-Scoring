@@ -1820,7 +1820,7 @@ function ScoresPanel({ rounds, judges, competitors, pendingEmails, onRefresh }) 
       ) : (
         <div className="space-y-2">
           {sortedScores.map((score) => (
-            <div key={score.id} className="bg-[#18181b] p-4 rounded border border-[#27272a] flex justify-between items-center">
+            <div key={score.id} className={`bg-[#18181b] p-4 rounded border flex justify-between items-center ${score.email_sent ? 'border-[#27272a]' : 'border-[#f59e0b]/50'}`}>
               <div className="flex-1 grid grid-cols-2 md:grid-cols-5 gap-4">
                 <div>
                   <p className="text-xs text-[#a1a1aa]">Competitor</p>
@@ -1843,11 +1843,27 @@ function ScoresPanel({ rounds, judges, competitors, pendingEmails, onRefresh }) 
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-[#a1a1aa]">Submitted</p>
-                  <p className="text-white text-sm">{new Date(score.submitted_at).toLocaleString()}</p>
+                  <p className="text-xs text-[#a1a1aa]">Status</p>
+                  <p className={`text-sm ${score.email_sent ? 'text-[#22c55e]' : 'text-[#f59e0b]'}`}>
+                    {score.email_sent ? '✓ Emailed' : 'Not emailed'}
+                  </p>
                 </div>
               </div>
               <div className="flex gap-2 ml-4">
+                {!score.email_sent && (
+                  <Button
+                    onClick={() => {
+                      setEmailDialog({ competitor_id: score.competitor_id, round_id: score.round_id, competitor_name: score.competitor_name, car_number: score.car_number });
+                      setEmailAddress('');
+                    }}
+                    variant="outline"
+                    size="sm"
+                    className="border-[#3b82f6] text-[#3b82f6] hover:bg-[#3b82f6] hover:text-white"
+                  >
+                    <Send className="w-3 h-3 mr-1" />
+                    Email
+                  </Button>
+                )}
                 <Button
                   onClick={() => handleEdit(score)}
                   variant="outline"
