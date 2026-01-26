@@ -1048,6 +1048,93 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Settings/Logo endpoints
+@api_router.post("/admin/settings/logo")
+async def upload_logo(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
+    """Upload organization logo for reports"""
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    # Validate file type
+    allowed_types = ["image/png", "image/jpeg", "image/jpg", "image/webp"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Only PNG, JPG, and WebP images are allowed")
+    
+    # Read file and convert to base64
+    content = await file.read()
+    if len(content) > 2 * 1024 * 1024:  # 2MB limit
+        raise HTTPException(status_code=400, detail="File too large. Maximum size is 2MB")
+    
+    base64_data = base64.b64encode(content).decode('utf-8')
+    
+    # Store in settings collection
+    await db.settings.update_one(
+        {"key": "logo"},
+        {"$set": {
+            "key": "logo",
+            "data": base64_data,
+            "content_type": file.content_type,
+            "filename": file.filename,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
+    
+    return {"message": "Logo uploaded successfully", "filename": file.filename}
+
+@api_router.get("/admin/settings/logo")
+async def get_logo():
+    """Get organization logo"""
+    logo = await db.settings.find_one({"key": "logo"}, {"_id": 0})
+    if not logo:
+        return {"logo": None}
+    return {
+        "logo": f"data:{logo['content_type']};base64,{logo['data']}",
+        "filename": logo.get("filename")
+    }
+
+@api_router.delete("/admin/settings/logo")
+async def delete_logo(current_user: User = Depends(get_current_user)):
+    """Delete organization logo"""
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    await db.settings.delete_one({"key": "logo"})
+    return {"message": "Logo deleted successfully"}
+
+@api_router.get("/admin/settings/website")
+async def get_website_settings():
+    """Get website/organization name for reports"""
+    settings = await db.settings.find_one({"key": "website"}, {"_id": 0})
+    if not settings:
+        return {"website_url": "", "organization_name": ""}
+    return {
+        "website_url": settings.get("website_url", ""),
+        "organization_name": settings.get("organization_name", "")
+    }
+
+@api_router.put("/admin/settings/website")
+async def update_website_settings(
+    website_url: str = "",
+    organization_name: str = "",
+    current_user: User = Depends(get_current_user)
+):
+    """Update website/organization settings"""
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin only")
+    
+    await db.settings.update_one(
+        {"key": "website"},
+        {"$set": {
+            "key": "website",
+            "website_url": website_url,
+            "organization_name": organization_name,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
+    return {"message": "Settings updated successfully"}
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
