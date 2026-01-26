@@ -1874,9 +1874,9 @@ async def generate_competitor_email_html(competitor_id: str, round_id: Optional[
         round_name = round_info.get("name", "Unknown Round")
         
         html += f'<div class="round-section"><div class="round-header">{round_name}</div><table><tr><th>Category</th>'
-        for score in round_scores:
-            judge = judges_dict.get(score["judge_id"], {})
-            html += f'<th style="font-size:11px;">{judge.get("name", "Judge")}</th>'
+        # Number judges as Judge 1, Judge 2, etc.
+        for idx, score in enumerate(round_scores, start=1):
+            html += f'<th style="font-size:11px;">Judge {idx}</th>'
         html += '</tr>'
         
         categories = [("Tip In", "tip_in"), ("Instant Smoke", "instant_smoke"), ("Constant Smoke", "constant_smoke"),
