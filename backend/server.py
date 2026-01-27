@@ -506,6 +506,48 @@ async def get_scoring_errors(admin: User = Depends(require_admin)):
     
     return errors
 
+# Score deviation settings
+@api_router.get("/admin/settings/score-deviation")
+async def get_score_deviation_settings(admin: User = Depends(require_admin)):
+    """Get score deviation threshold setting"""
+    settings = await db.settings.find_one({"key": "score_deviation"}, {"_id": 0})
+    return {"threshold": settings.get("threshold", 5) if settings else 5}
+
+@api_router.put("/admin/settings/score-deviation")
+async def update_score_deviation_settings(threshold: float, admin: User = Depends(require_admin)):
+    """Update score deviation threshold setting"""
+    if threshold < 0:
+        raise HTTPException(status_code=400, detail="Threshold must be positive")
+    
+    await db.settings.update_one(
+        {"key": "score_deviation"},
+        {"$set": {"key": "score_deviation", "threshold": threshold}},
+        upsert=True
+    )
+    return {"threshold": threshold, "message": "Threshold updated"}
+
+@api_router.post("/admin/scores/{score_id}/acknowledge-deviation")
+async def acknowledge_score_deviation(score_id: str, admin: User = Depends(require_admin)):
+    """Mark a score's deviation as acknowledged/reviewed"""
+    result = await db.scores.update_one(
+        {"id": score_id},
+        {"$set": {"deviation_acknowledged": True}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Score not found")
+    return {"message": "Score deviation acknowledged"}
+
+@api_router.post("/admin/scores/{score_id}/unacknowledge-deviation")
+async def unacknowledge_score_deviation(score_id: str, admin: User = Depends(require_admin)):
+    """Remove acknowledgment from a score's deviation"""
+    result = await db.scores.update_one(
+        {"id": score_id},
+        {"$set": {"deviation_acknowledged": False}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Score not found")
+    return {"message": "Score deviation acknowledgment removed"}
+
 # Admin - Class management
 @api_router.get("/admin/classes", response_model=List[CompetitionClass])
 async def get_classes(current_user: User = Depends(get_current_user)):
