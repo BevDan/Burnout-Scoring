@@ -373,10 +373,13 @@ class ScoringError(BaseModel):
     competitor_id: str
     competitor_name: str
     car_number: str
-    error_type: str  # "missing_scores" or "duplicate_scores"
+    error_type: str  # "missing_scores", "duplicate_scores", or "score_deviation"
     details: str
     judge_count: int
     expected_count: int
+    score_id: Optional[str] = None  # For deviation errors, allows acknowledgment
+    judge_name: Optional[str] = None  # For deviation errors, which judge
+    deviation_amount: Optional[float] = None  # How much the score deviates
 
 @api_router.get("/admin/scoring-errors", response_model=List[ScoringError])
 async def get_scoring_errors(admin: User = Depends(require_admin)):
