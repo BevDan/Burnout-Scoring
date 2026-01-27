@@ -602,6 +602,49 @@ export default function AdminDashboard({ user, onLogout }) {
             </div>
           </div>
 
+          {/* Score Validation Settings */}
+          <div className="space-y-4 mt-6">
+            <h3 className="ui-font text-lg font-semibold text-white border-b border-[#27272a] pb-2 flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-[#8b5cf6]" />
+              Score Validation
+            </h3>
+            
+            <div className="bg-[#09090b] p-4 rounded border border-[#27272a]">
+              <p className="text-xs text-[#a1a1aa] mb-3">
+                Flag scores when a judge's score differs significantly from the average. 
+                Set the threshold (in points) that triggers a deviation warning.
+              </p>
+              
+              <div className="flex items-end gap-3">
+                <div className="flex-1">
+                  <Label className="text-xs">Deviation Threshold (points)</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="50"
+                    step="0.5"
+                    value={deviationThreshold}
+                    onChange={(e) => setDeviationThreshold(parseFloat(e.target.value) || 5)}
+                    className="bg-[#18181b] border-[#27272a] text-sm w-32"
+                    data-testid="deviation-threshold-input"
+                  />
+                </div>
+                <Button 
+                  onClick={handleDeviationThresholdUpdate} 
+                  size="sm" 
+                  className="btn-primary"
+                  data-testid="save-deviation-threshold"
+                >
+                  Save Threshold
+                </Button>
+              </div>
+              <p className="text-xs text-[#71717a] mt-2">
+                Example: If threshold is 5, a score that differs more than 5 points from the average will be flagged for review.
+                You can acknowledge reviewed scores to dismiss the warning.
+              </p>
+            </div>
+          </div>
+
           {/* Email/SMTP Settings Section */}
           <div className="space-y-4 mt-6">
             <h3 className="ui-font text-lg font-semibold text-white border-b border-[#27272a] pb-2 flex items-center gap-2">
