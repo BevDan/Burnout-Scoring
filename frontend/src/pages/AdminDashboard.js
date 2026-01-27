@@ -189,6 +189,26 @@ export default function AdminDashboard({ user, onLogout }) {
     }
   };
 
+  const handleDeviationThresholdUpdate = async () => {
+    try {
+      await axios.put(`${API}/admin/settings/score-deviation?threshold=${deviationThreshold}`, {}, getAuthHeaders());
+      toast.success('Score deviation threshold saved');
+      fetchScoringErrors();
+    } catch (error) {
+      toast.error('Failed to save threshold');
+    }
+  };
+
+  const handleAcknowledgeDeviation = async (scoreId) => {
+    try {
+      await axios.post(`${API}/admin/scores/${scoreId}/acknowledge-deviation`, {}, getAuthHeaders());
+      toast.success('Deviation acknowledged');
+      fetchScoringErrors();
+    } catch (error) {
+      toast.error('Failed to acknowledge deviation');
+    }
+  };
+
   const handleProfileUpdate = async () => {
     try {
       const updateData = {};
