@@ -342,7 +342,7 @@ export default function AdminDashboard({ user, onLogout }) {
                 </p>
               </div>
             </div>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
+            <div className="space-y-2 max-h-64 overflow-y-auto">
               {scoringErrors.map((error, idx) => (
                 <div 
                   key={idx}
@@ -355,18 +355,36 @@ export default function AdminDashboard({ user, onLogout }) {
                       <p className="text-xs text-[#a1a1aa]">{error.round_name}</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-semibold ${
-                      error.error_type === 'missing_scores' 
-                        ? 'bg-[#f59e0b]/20 text-[#f59e0b]' 
-                        : 'bg-[#ef4444]/20 text-[#ef4444]'
-                    }`}>
-                      {error.error_type === 'missing_scores' ? 'Missing Scores' : 'Duplicate Scores'}
-                    </span>
-                    <p className="text-xs text-[#a1a1aa] mt-1">{error.details}</p>
-                    <p className="text-xs text-[#71717a]">
-                      {error.judge_count}/{error.expected_count} judges
-                    </p>
+                  <div className="text-right flex items-center gap-3">
+                    <div>
+                      <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-semibold ${
+                        error.error_type === 'missing_scores' 
+                          ? 'bg-[#f59e0b]/20 text-[#f59e0b]' 
+                          : error.error_type === 'score_deviation'
+                          ? 'bg-[#8b5cf6]/20 text-[#8b5cf6]'
+                          : 'bg-[#ef4444]/20 text-[#ef4444]'
+                      }`}>
+                        {error.error_type === 'missing_scores' ? 'Missing Scores' : 
+                         error.error_type === 'score_deviation' ? 'Score Deviation' : 'Duplicate Scores'}
+                      </span>
+                      <p className="text-xs text-[#a1a1aa] mt-1">{error.details}</p>
+                      {error.error_type !== 'score_deviation' && (
+                        <p className="text-xs text-[#71717a]">
+                          {error.judge_count}/{error.expected_count} judges
+                        </p>
+                      )}
+                    </div>
+                    {error.error_type === 'score_deviation' && error.score_id && (
+                      <Button
+                        onClick={() => handleAcknowledgeDeviation(error.score_id)}
+                        variant="outline"
+                        size="sm"
+                        className="border-[#8b5cf6] text-[#8b5cf6] hover:bg-[#8b5cf6] hover:text-white text-xs"
+                        data-testid={`acknowledge-deviation-${error.score_id}`}
+                      >
+                        OK
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
