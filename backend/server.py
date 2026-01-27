@@ -164,6 +164,7 @@ class Score(BaseModel):
     penalty_total: int = 0
     final_score: float = 0
     email_sent: bool = False  # Track if score report was emailed
+    deviation_acknowledged: bool = False  # Mark as reviewed if score deviates from average
     submitted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     edited_at: Optional[datetime] = None
 
