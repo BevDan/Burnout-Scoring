@@ -93,6 +93,13 @@ export default function AdminDashboard({ user, onLogout }) {
     } catch (error) {
       // SMTP settings might not exist yet
     }
+    // Fetch score deviation threshold
+    try {
+      const deviationRes = await axios.get(`${API}/admin/settings/score-deviation`, getAuthHeaders());
+      setDeviationThreshold(deviationRes.data.threshold);
+    } catch (error) {
+      // Use default
+    }
   };
 
   const handleLogoUpload = async (e) => {
