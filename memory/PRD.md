@@ -126,6 +126,16 @@ Build a full-stack web application to score a burnout competition with:
 - [x] **Partial scoring exclusion** - Competitor/round combos only appear in pending emails when ALL active judges have scored
 - [x] **Comprehensive email reports** - Bulk email includes ALL completed rounds (previously emailed + newly completed) in one email
 - [x] **Cumulative progress tracking** - Only the newly completed round is marked as "emailed", allowing future rounds to trigger new comprehensive emails
+- [x] **Penalty breakdown in emails** - Bulk emails show individual penalties (Reversing, Stopping, etc.) instead of just total
+
+### Phase 10: Score Deviation Validation (Complete - January 27, 2026)
+- [x] **Score deviation detection** - Flag when a judge's score differs significantly from the average
+- [x] **Configurable threshold** - Admin can set deviation threshold in Settings (default 5 points)
+- [x] **Score Validation settings** - New section in Settings dialog with threshold input
+- [x] **Deviation errors display** - Score deviations shown in purple in Scoring Issues section
+- [x] **Acknowledge button** - OK button to dismiss reviewed deviations
+- [x] **deviation_acknowledged field** - Added to Score model to track acknowledged deviations
+- [x] **Error details** - Shows judge name, score value, deviation amount, and average
 
 ---
 
