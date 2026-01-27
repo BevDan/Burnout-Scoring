@@ -226,6 +226,7 @@ class ScoreWithDetails(BaseModel):
     penalty_total: int = 0
     final_score: float = 0
     email_sent: bool = False
+    deviation_acknowledged: bool = False
     submitted_at: datetime
     edited_at: Optional[datetime] = None
 
