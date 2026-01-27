@@ -40,6 +40,9 @@ export default function AdminDashboard({ user, onLogout }) {
   });
   const [smtpTesting, setSmtpTesting] = useState(false);
   
+  // Score deviation settings
+  const [deviationThreshold, setDeviationThreshold] = useState(5);
+  
   // Scoring errors
   const [scoringErrors, setScoringErrors] = useState([]);
   
