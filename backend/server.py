@@ -383,8 +383,12 @@ class ScoringError(BaseModel):
 
 @api_router.get("/admin/scoring-errors", response_model=List[ScoringError])
 async def get_scoring_errors(admin: User = Depends(require_admin)):
-    """Check for scoring errors: missing scores from active judges or duplicate scores"""
+    """Check for scoring errors: missing scores, duplicate scores, or score deviations"""
     errors = []
+    
+    # Get score deviation threshold from settings (default 5)
+    deviation_settings = await db.settings.find_one({"key": "score_deviation"}, {"_id": 0})
+    deviation_threshold = deviation_settings.get("threshold", 5) if deviation_settings else 5
     
     # Get active judges
     active_judges = await db.users.find(
@@ -392,6 +396,7 @@ async def get_scoring_errors(admin: User = Depends(require_admin)):
         {"_id": 0, "id": 1, "name": 1}
     ).to_list(100)
     active_judge_ids = [j["id"] for j in active_judges]
+    active_judge_map = {j["id"]: j["name"] for j in active_judges}
     active_judge_count = len(active_judge_ids)
     
     if active_judge_count == 0:
@@ -414,24 +419,24 @@ async def get_scoring_errors(admin: User = Depends(require_admin)):
         # Group scores by competitor for this round
         round_scores = [s for s in all_scores if s["round_id"] == round_id]
         
-        # Build a map: competitor_id -> list of judge_ids who scored them
-        competitor_judges = {}
+        # Build a map: competitor_id -> list of scores
+        competitor_scores_map = {}
         for score in round_scores:
             comp_id = score["competitor_id"]
-            judge_id = score["judge_id"]
-            if comp_id not in competitor_judges:
-                competitor_judges[comp_id] = []
-            competitor_judges[comp_id].append(judge_id)
+            if comp_id not in competitor_scores_map:
+                competitor_scores_map[comp_id] = []
+            competitor_scores_map[comp_id].append(score)
         
         # Check each competitor that has at least one score in this round
-        for comp_id, judge_ids in competitor_judges.items():
+        for comp_id, scores in competitor_scores_map.items():
             competitor = competitor_map.get(comp_id)
             if not competitor:
                 continue
             
-            # Only count scores from active judges
-            active_judge_scores = [j for j in judge_ids if j in active_judge_ids]
-            unique_active_judges = set(active_judge_scores)
+            # Only consider scores from active judges
+            active_scores = [s for s in scores if s["judge_id"] in active_judge_ids]
+            judge_ids = [s["judge_id"] for s in active_scores]
+            unique_active_judges = set(judge_ids)
             
             # Check for missing scores (not all active judges have scored)
             if len(unique_active_judges) < active_judge_count:
@@ -449,16 +454,11 @@ async def get_scoring_errors(admin: User = Depends(require_admin)):
                 ))
             
             # Check for duplicate scores (same judge scored same competitor twice in round)
-            if len(active_judge_scores) != len(unique_active_judges):
-                # Find which judges have duplicates
+            if len(judge_ids) != len(unique_active_judges):
                 from collections import Counter
-                judge_counts = Counter(active_judge_scores)
+                judge_counts = Counter(judge_ids)
                 duplicates = [jid for jid, count in judge_counts.items() if count > 1]
-                duplicate_names = []
-                for jid in duplicates:
-                    judge = next((j for j in active_judges if j["id"] == jid), None)
-                    if judge:
-                        duplicate_names.append(judge["name"])
+                duplicate_names = [active_judge_map.get(jid, "Unknown") for jid in duplicates]
                 
                 errors.append(ScoringError(
                     round_id=round_id,
@@ -468,9 +468,41 @@ async def get_scoring_errors(admin: User = Depends(require_admin)):
                     car_number=competitor.get("car_number", "?"),
                     error_type="duplicate_scores",
                     details=f"Duplicate scores from: {', '.join(duplicate_names)}",
-                    judge_count=len(active_judge_scores),
+                    judge_count=len(judge_ids),
                     expected_count=active_judge_count
                 ))
+            
+            # Check for score deviations (only if we have multiple scores to compare)
+            if len(active_scores) >= 2:
+                # Calculate average final score
+                final_scores = [s.get("final_score", 0) for s in active_scores]
+                avg_score = sum(final_scores) / len(final_scores)
+                
+                # Check each score against the average
+                for score in active_scores:
+                    # Skip if already acknowledged
+                    if score.get("deviation_acknowledged", False):
+                        continue
+                    
+                    score_value = score.get("final_score", 0)
+                    deviation = abs(score_value - avg_score)
+                    
+                    if deviation > deviation_threshold:
+                        judge_name = active_judge_map.get(score["judge_id"], "Unknown")
+                        errors.append(ScoringError(
+                            round_id=round_id,
+                            round_name=round_name,
+                            competitor_id=comp_id,
+                            competitor_name=competitor.get("name", "Unknown"),
+                            car_number=competitor.get("car_number", "?"),
+                            error_type="score_deviation",
+                            details=f"{judge_name}'s score ({score_value}) deviates {deviation:.1f} pts from average ({avg_score:.1f})",
+                            judge_count=len(active_scores),
+                            expected_count=active_judge_count,
+                            score_id=score.get("id"),
+                            judge_name=judge_name,
+                            deviation_amount=deviation
+                        ))
     
     return errors
 
