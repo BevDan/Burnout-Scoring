@@ -1789,6 +1789,9 @@ async def send_competitor_report(request: EmailRequest, admin: User = Depends(re
         for score in round_scores:
             final = score.get("final_score", 0)
             total_scores.append(final)
+            # Track minor round scores separately for grand total
+            if is_minor:
+                minor_round_scores.append(final)
             if score.get("penalty_disqualified", False):
                 html_content += '<td style="color:#dc2626;">0 (DQ)</td>'
             else:
@@ -1801,14 +1804,17 @@ async def send_competitor_report(request: EmailRequest, admin: User = Depends(re
         </div>
         """
     
-    # Summary
-    if total_scores:
-        avg_score = sum(total_scores) / len(total_scores)
-        total_score = sum(total_scores)
+    # Count minor rounds for the summary
+    minor_round_count = sum(1 for rid in scores_by_round.keys() if rounds_dict.get(rid, {}).get("is_minor", False))
+    
+    # Summary - show minor rounds total/average if available
+    if minor_round_scores:
+        avg_score = sum(minor_round_scores) / len(minor_round_scores)
+        total_score = sum(minor_round_scores)
         html_content += f"""
         <div class="summary-box">
-            <div>Total Score: <span class="summary-score">{total_score}</span></div>
-            <div style="color:#666;margin-top:5px;">Average Score: {avg_score:.2f} (from {len(scores_by_round)} round(s))</div>
+            <div>Minor Rounds Total: <span class="summary-score">{total_score:.1f}</span></div>
+            <div style="color:#666;margin-top:5px;">Minor Rounds Average: {avg_score:.2f} (from {minor_round_count} minor round(s))</div>
         </div>
         """
     
