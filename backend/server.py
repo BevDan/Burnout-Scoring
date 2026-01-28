@@ -1689,13 +1689,16 @@ async def send_competitor_report(request: EmailRequest, admin: User = Depends(re
     """
     
     total_scores = []
+    minor_round_scores = []  # Only scores from minor rounds for grand total
+    
     for round_id, round_scores in scores_by_round.items():
         round_info = rounds_dict.get(round_id, {})
         round_name = round_info.get("name", "Unknown Round")
+        is_minor = round_info.get("is_minor", False)
         
         html_content += f"""
         <div class="round-section">
-            <div class="round-header">{round_name}</div>
+            <div class="round-header">{round_name}{" (Minor Round)" if is_minor else ""}</div>
             <table class="score-table">
                 <thead>
                     <tr>
