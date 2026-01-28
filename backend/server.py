@@ -2063,6 +2063,9 @@ async def generate_competitor_email_html(competitor_id: str, round_id: Optional[
         for score in round_scores:
             final = score.get("final_score", 0)
             total_scores.append(final)
+            # Track minor round scores separately for grand total
+            if is_minor:
+                minor_round_scores.append(final)
             if score.get("penalty_disqualified"):
                 html += '<td style="color:#dc2626;">0 (DQ)</td>'
             else:
@@ -2076,11 +2079,14 @@ async def generate_competitor_email_html(competitor_id: str, round_id: Optional[
             <strong>Round Total: {round_total:.1f}</strong> &nbsp;|&nbsp; Average: {round_avg:.2f}
         </div></div>'''
     
-    # Only show overall summary if multiple rounds
-    if len(scores_by_round) > 1 and total_scores:
+    # Count minor rounds for the summary
+    minor_round_count = sum(1 for rid in scores_by_round.keys() if rounds_dict.get(rid, {}).get("is_minor", False))
+    
+    # Only show overall summary if there are minor round scores
+    if minor_round_scores:
         html += f'''<div class="summary-box">
-            <div>Overall Total: <span class="summary-score">{sum(total_scores)}</span></div>
-            <div style="color:#666;margin-top:5px;">Overall Average: {sum(total_scores)/len(total_scores):.2f} (from {len(scores_by_round)} round(s))</div>
+            <div>Minor Rounds Total: <span class="summary-score">{sum(minor_round_scores):.1f}</span></div>
+            <div style="color:#666;margin-top:5px;">Minor Rounds Average: {sum(minor_round_scores)/len(minor_round_scores):.2f} (from {minor_round_count} minor round(s))</div>
         </div>'''
     
     html += f'<div class="footer">Generated on {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}<br/>{website_url}</div></body></html>'
