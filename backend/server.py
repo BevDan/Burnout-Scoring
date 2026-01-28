@@ -1996,11 +1996,14 @@ async def generate_competitor_email_html(competitor_id: str, round_id: Optional[
     </div>"""
     
     total_scores = []
+    minor_round_scores = []  # Only scores from minor rounds for grand total
+    
     for rid, round_scores in scores_by_round.items():
         round_info = rounds_dict.get(rid, {})
         round_name = round_info.get("name", "Unknown Round")
+        is_minor = round_info.get("is_minor", False)
         
-        html += f'<div class="round-section"><div class="round-header">{round_name}</div><table><tr><th>Category</th>'
+        html += f'<div class="round-section"><div class="round-header">{round_name}{" (Minor Round)" if is_minor else ""}</div><table><tr><th>Category</th>'
         # Number judges as Judge 1, Judge 2, etc.
         for idx, score in enumerate(round_scores, start=1):
             html += f'<th style="font-size:11px;">Judge {idx}</th>'
